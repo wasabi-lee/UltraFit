@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    package="com.inceptedapps.wasabi.ultimateworkouttimerforhiit">
+
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="com.android.vending.BILLING" />
+
+    <application
+        android:name=".MyApplication"
+        android:allowBackup="false"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:supportsRtl="true"
+        android:theme="@style/AppTheme">
+        <activity
+            android:name=".Activities.MainActivity"
+            android:screenOrientation="portrait">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".Activities.HiitSettingActivity"
+            android:label="Create your timer" />
+        <activity
+            android:name=".Activities.HiitTimerActivity"
+            android:launchMode="singleTask" />
+        <activity android:name=".HIIT.HiitTimerListActivity" />
+        <activity android:name=".ProgressTracker.ProgressActivity" />
+        <activity
+            android:name=".Activities.AdvancedSettingActivity"
+            android:screenOrientation="portrait" />
+        <activity android:name=".Activities.MusicSettingActivity" />
+        <activity
+            android:name=".Activities.CurrentMusicListActivity"
+            android:label="@string/title_activity_current_music_list"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme" />
+
+        <service android:name=".Service.MusicService" />
+        <service android:name=".Service.KillNotificationsService" />
+
+        <activity android:name=".Activities.SettingsActivity" />
+        <activity android:name=".GoPremiumActivity" />
+        <activity android:name=".Activities.TickSettingActivity" />
+    </application>
+
+</manifest>

@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- *************Beep sound option ************* -->
+
+    <string-array name="beep_sound_array">
+        <item>Basic Beep</item>
+        <item>Whistle</item>
+        <item>Machine Gun</item>
+        <item>Rifle Shot</item>
+        <item>Chime Bell</item>
+        <item>Click</item>
+        <item>Glass Click</item>
+        <item>Home Run</item>
+        <item>Xylophone Beep</item>
+    </string-array>
+    <string-array name="beep_sound_array_value">
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+        <item>5</item>
+        <item>6</item>
+        <item>7</item>
+        <item>8</item>
+        <item>9</item>
+    </string-array>
+
+
+    <!-- *************Beep sound option ************* -->
+
+    <string-array name="tick_sound_array">
+        <item>Basic Tick</item>
+        <item>Camera Click</item>
+        <item>Hint</item>
+        <item>Pistol</item>
+        <item>Shotgun Pump</item>
+        <item>Temple Block</item>
+        <item>Xylophone Tick</item>
+    </string-array>
+    <string-array name="tick_sound_array_value">
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+        <item>5</item>
+        <item>6</item>
+        <item>7</item>
+    </string-array>
+
+
+    <!-- *************Sound option ************* -->
+
+    <string-array name="transition_ticks">
+        <item>3 ticks</item>
+        <item>5 ticks</item>
+        <item>10 ticks</item>
+    </string-array>
+    <string-array name="transition_ticks_values">
+        <item>3</item>
+        <item>5</item>
+        <item>10</item>
+    </string-array>
+
+
+
+    <!-- *************Sound option ************* -->
+
+    <string-array name="chart_view">
+        <item>3 days</item>
+        <item>5 days</item>
+        <item>7 days</item>
+        <item>10 days</item>
+    </string-array>
+    <string-array name="chart_view_value">
+        <item>3</item>
+        <item>5</item>
+        <item>7</item>
+        <item>10</item>
+    </string-array>
+
+
+    <!-- *************Sound option ************* -->
+
+    <string-array name="theme_color">
+        <item>Teal Blue</item>
+        <item>Attitude Pink</item>
+        <item>Night Shadow</item>
+        <item>Serious Gray</item>
+        <item>Rage Green</item>
+    </string-array>
+    <string-array name="theme_color_values">
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+        <item>5</item>
+    </string-array>
+</resources>

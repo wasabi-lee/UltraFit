@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <Preference
+        android:title="Beep Sound"
+        android:key="@string/SHARED_PREF_BEEP_SOUND_SELECTION_KEY"
+        android:dialogTitle="Select a sound"
+        android:defaultValue="1"
+        android:summary="%s"/>
+    <Preference
+        android:title="Tick Sound"
+        android:key="@string/SHARED_PREF_TICK_SOUND_SELECTION_KEY"
+        android:dialogTitle="Select a tick sound"
+        android:defaultValue="1"
+        android:summary="%s"/>
+    <CheckBoxPreference
+        android:title="Cue Overlap"
+        android:key="@string/SHARED_PREF_CUE_OVERLAP_KEY"
+        android:summary="Allow cue to overlap music"
+        android:defaultValue="false"/>
+    <CheckBoxPreference
+        android:title="Vibration"
+        android:key="@string/SHARED_PREF_VIBRATION_KEY"
+        android:summaryOn="Enabled"
+        android:summaryOff="Disabled"
+        android:defaultValue="true"/>
+    <ListPreference
+        android:title="Transition Ticks"
+        android:key="@string/SHARED_PREF_TRANSITION_TICKS_KEY"
+        android:summary="%s"
+        android:dialogTitle="Number of ticks before next set"
+        android:defaultValue="3"
+        android:entries="@array/transition_ticks"
+        android:entryValues="@array/transition_ticks_values"/>
+    <ListPreference
+        android:title="Chart View"
+        android:key="@string/SHARED_PREF_CHART_VIEW_KEY"
+        android:summary="%s"
+        android:dialogTitle="Days to view in chart"
+        android:defaultValue="5"
+        android:entries="@array/chart_view"
+        android:entryValues="@array/chart_view_value"/>
+    <ListPreference
+        android:title="Theme Color"
+        android:key="@string/SHARED_PREF_COLOR_THEME_KEY"
+        android:summary="%s"
+        android:dialogTitle="Choose a theme color"
+        android:defaultValue="1"
+        android:entries="@array/theme_color"
+        android:entryValues="@array/theme_color_values"/>
+</PreferenceScreen>

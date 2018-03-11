@@ -1,0 +1,346 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v4.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:ads="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/music_drawer"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+            xmlns:tools="http://schemas.android.com/tools"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:orientation="vertical"
+            tools:context=".Activities.HiitTimerActivity">
+
+
+            <TextView
+                android:id="@+id/hiit_timer_workout_textView"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="0.12"
+                android:gravity="center"
+                android:text="@string/session_work"
+                android:padding="20dp"
+                android:textSize="70sp"
+                android:maxLines="2"
+                android:textStyle="bold|italic" />
+
+            <View
+                android:layout_width="300dp"
+                android:layout_height="1dp"
+                android:background="#e3e3e3" />
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="0.5">
+
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:gravity="center"
+                    android:orientation="vertical">
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="right"
+                        android:gravity="right">
+
+                        <TextView
+                            android:id="@+id/hiit_timer_mins_textView"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:text="@string/hiit_timer_minutes"
+                            android:fontFamily="sans-serif-thin"
+                            android:textColor="?attr/colorPrimary"
+                            android:textSize="70sp" />
+
+                        <TextView
+                            android:id="@+id/hiit_timer_mins_text_textView"
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            android:layout_gravity="center"
+                            android:fontFamily="sans-serif-thin"
+                            android:gravity="bottom"
+                            android:text="@string/hiit_timer_minute_text"
+                            android:textColor="?attr/colorPrimary"
+                            android:textSize="40sp" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="-20dp"
+                        android:gravity="center_horizontal">
+
+                        <TextView
+                            android:id="@+id/hiit_timer_seconds_textView"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:text="@string/hiit_timer_seconds"
+                            android:fontFamily="sans-serif-thin"
+                            android:textColor="?attr/colorPrimary"
+                            android:textSize="120sp" />
+
+                        <TextView
+                            android:id="@+id/hiit_timer_seconds_text_textView"
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            android:layout_gravity="center"
+                            android:fontFamily="sans-serif-thin"
+                            android:gravity="bottom"
+                            android:text="@string/hiit_timer_second_text"
+                            android:textColor="?attr/colorPrimary"
+                            android:textSize="60sp" />
+                    </LinearLayout>
+                </LinearLayout>
+
+                <ProgressBar
+                    android:id="@+id/hiit_timer_progressBar"
+                    style="?android:attr/progressBarStyleHorizontal"
+                    android:background="?circularProgress"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="center"
+                    android:indeterminate="false"
+                    android:progressDrawable="?circularProgress"
+                    android:rotation="270" />
+
+                <ImageView
+                    android:id="@+id/music_drawer_button"
+                    android:layout_width="50dp"
+                    android:layout_height="100dp"
+                    android:src="@drawable/arrow_gray"
+                    android:padding="20dp"
+                    android:layout_gravity="left|center_vertical" />
+
+
+            </FrameLayout>
+
+            <TextView
+                android:id="@+id/hiit_timer_reps_textView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="sans-serif-thin"
+                android:gravity="center"
+                android:text="@string/hiit_timer_reps_text"
+                android:textColor="?attr/colorPrimary"
+                android:textSize="80sp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="top|center_horizontal">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginRight="10dp"
+                    android:text="@string/session_total"
+                    android:textColor="?attr/colorPrimary"
+                    android:textSize="80sp" />
+
+                <TextView
+                    android:id="@+id/hiit_timer_total_textView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginRight="10dp"
+                    android:text="@string/hiit_timer_total_text"
+                    android:textSize="80sp" />
+
+            </LinearLayout>
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:layout_gravity="bottom"
+                    android:background="@android:color/transparent"
+                    android:gravity="center"
+                    android:text="@string/unique_app_name"
+                    android:textSize="12sp" />
+
+                <com.google.android.gms.ads.AdView
+                    android:id="@+id/adView"
+                    ads:adSize="BANNER"
+                    ads:adUnitId="@string/banner_ad_on_timer"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center|bottom"/>
+
+            </FrameLayout>
+        </LinearLayout>
+
+    </FrameLayout>
+
+
+    <FrameLayout
+        android:layout_width="700dp"
+        android:layout_gravity="start"
+        android:layout_height="match_parent">
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <ImageView
+                    android:id="@+id/hiit_timer_album_art"
+                    android:layout_width="match_parent"
+                    android:layout_height="250dp"
+                    android:scaleType="centerCrop" />
+
+                <ImageView
+                    android:layout_width="match_parent"
+                    android:layout_height="250dp"
+                    android:background="@drawable/drawer_gradient_background" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="6dp"
+                    android:text="@string/music_drawer_now_playing"
+                    android:textColor="@android:color/white" />
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="right|top">
+
+                    <ImageView
+                        android:id="@+id/drawer_skip_prev_icon"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:paddingBottom="8dp"
+                        android:paddingLeft="16dp"
+                        android:paddingRight="16dp"
+                        android:paddingTop="8dp"
+                        android:src="@drawable/ic_skip_previous" />
+
+                    <ImageView
+                        android:id="@+id/drawer_play_pause_icon"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:paddingBottom="8dp"
+                        android:paddingLeft="16dp"
+                        android:paddingRight="16dp"
+                        android:paddingTop="8dp"
+                        android:src="@drawable/ic_pause" />
+
+                    <ImageView
+                        android:id="@+id/drawer_skip_next_icon"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:padding="8dp"
+                        android:paddingBottom="8dp"
+                        android:paddingLeft="16dp"
+                        android:paddingRight="16dp"
+                        android:paddingTop="8dp"
+                        android:src="@drawable/ic_skip_next" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="bottom"
+                    android:orientation="horizontal">
+
+
+                    <ImageView
+                        android:id="@+id/drawer_shuffle_icon"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="left|bottom"
+                        android:layout_weight="0.2"
+                        android:paddingBottom="8dp"
+                        android:paddingLeft="16dp"
+                        android:paddingRight="16dp"
+                        android:paddingTop="8dp"
+                        android:src="@drawable/ic_action_playback_repeat" />
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="right|bottom"
+                        android:layout_weight="0.8"
+                        android:gravity="right"
+                        android:orientation="vertical"
+                        android:padding="8dp">
+
+
+                        <TextView
+                            android:id="@+id/hiit_timer_song_name"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:gravity="right"
+                            android:text="@string/music_drawer_song_name"
+                            android:textColor="@android:color/white"
+                            android:textSize="16sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/hiit_timer_artist"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/music_drawer_artist"
+                            android:textColor="@android:color/white" />
+                    </LinearLayout>
+
+
+                </LinearLayout>
+
+            </FrameLayout>
+
+            <ListView
+                android:id="@+id/hiit_timer_song_list"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@android:color/white"
+                android:alpha="0.7" />
+
+        </LinearLayout>
+
+
+        <ImageView
+            android:id="@+id/no_music_background"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:alpha="0.5"
+            android:src="@android:color/darker_gray" />
+
+        <TextView
+            android:id="@+id/no_music_text"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:text="@string/music_drawer_no_music"
+            android:textColor="@android:color/white"
+            android:fontFamily="sans-serif-thin"
+            android:textSize="20sp" />
+
+    </FrameLayout>
+
+
+</android.support.v4.widget.DrawerLayout>

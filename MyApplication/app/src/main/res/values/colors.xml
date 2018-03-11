@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="tealBlueColorPrimary">#22bed6</color>
+    <color name="tealBlueColorPrimaryDark">#0a9cb3</color>
+    <color name="tealBlueColorAccent">#ff3679</color>
+    <color name="tealBlueColorTextColor">#131313</color>
+
+    <color name="hotPinkColorPrimary">#ec407a</color>
+    <color name="hotPinkCrimaryDark">#e91e63</color>
+    <color name="hotPinkColorAccent">#00bcd4</color>
+    <color name="hotPinkColorTextColor">#131313</color>
+
+
+    <color name="darkThemeColorPrimary">#33d2d5</color>
+    <color name="darkThemeColorPrimaryDark">#070a0e</color>
+    <color name="darkThemeColorAccent">#18ffff</color>
+    <color name="dartThemeColorTextColor">#ffffff</color>
+
+
+    <color name="lightGrayColorPrimary">#9e9e9e</color>
+    <color name="lightGrayColorPrimaryDark">#757575</color>
+    <color name="lightGrayColorAccent">#9dc400</color>
+    <color name="lightGrayColorTextColor">#131313</color>
+
+
+    <color name="limeGreenColorPrimary">#00d900</color>
+    <color name="limeGreenColorPrimaryDark">#00bb00</color>
+    <color name="limeGreenColorAccent">#64dd17</color>
+
+</resources>
