@@ -1,36 +1,21 @@
-package com.inceptedapps.wasabi.ultimateworkouttimerforhiit.HIIT;
+package com.inceptedapps.wasabi.ultimateworkouttimerforhiit.hiit;
 
-import android.content.Intent;
 import android.graphics.Color;
 import android.preference.PreferenceManager;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.Toolbar;
-import android.text.Layout;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
-import com.google.android.gms.ads.AdListener;
-import com.google.android.gms.ads.AdRequest;
-import com.google.android.gms.ads.InterstitialAd;
-import com.inceptedapps.wasabi.ultimateworkouttimerforhiit.Activities.HiitSettingActivity;
-import com.inceptedapps.wasabi.ultimateworkouttimerforhiit.Activities.MainActivity;
-import com.inceptedapps.wasabi.ultimateworkouttimerforhiit.PrivateClasses.IsPremiumSingleton;
-import com.inceptedapps.wasabi.ultimateworkouttimerforhiit.PrivateClasses.ThemeUtils;
-import com.inceptedapps.wasabi.ultimateworkouttimerforhiit.ProgressTracker.WorkoutLog;
+import com.inceptedapps.wasabi.ultimateworkouttimerforhiit.custom.ThemeUtils;
 import com.inceptedapps.wasabi.ultimateworkouttimerforhiit.R;
 
-import java.io.FileNotFoundException;
-import java.util.Calendar;
-
-import io.realm.DynamicRealm;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 import io.realm.Realm;
-import io.realm.RealmConfiguration;
-import io.realm.RealmMigration;
 import io.realm.RealmResults;
 
 public class HiitTimerListActivity extends AppCompatActivity {

@@ -1,6 +1,4 @@
-package com.inceptedapps.wasabi.ultimateworkouttimerforhiit.PrivateClasses;
-
-import android.util.TimeUtils;
+package com.inceptedapps.wasabi.ultimateworkouttimerforhiit.custom;
 
 import java.util.concurrent.TimeUnit;
 

@@ -1,17 +1,19 @@
-package com.inceptedapps.wasabi.ultimateworkouttimerforhiit.Activities;
+package com.inceptedapps.wasabi.ultimateworkouttimerforhiit.activities;
 
 import android.content.Intent;
 import android.graphics.Color;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+
 import com.inceptedapps.wasabi.ultimateworkouttimerforhiit.GoPremiumActivity;
-import com.inceptedapps.wasabi.ultimateworkouttimerforhiit.PrivateClasses.ThemeUtils;
 import com.inceptedapps.wasabi.ultimateworkouttimerforhiit.R;
+import com.inceptedapps.wasabi.ultimateworkouttimerforhiit.custom.ThemeUtils;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 
 public class SettingsActivity extends AppCompatActivity implements SettingsFragment.OnThemeChangedListener {
 
@@ -26,7 +28,7 @@ public class SettingsActivity extends AppCompatActivity implements SettingsFragm
 
         Log.d(getClass().getSimpleName(), "onCreate");
         initializeToolbar();
-        getFragmentManager().beginTransaction()
+        getSupportFragmentManager().beginTransaction()
                 .replace(R.id.settings_fragment, new SettingsFragment())
                 .commit();
     }

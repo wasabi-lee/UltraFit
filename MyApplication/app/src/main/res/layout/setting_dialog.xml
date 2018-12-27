@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
@@ -52,7 +53,7 @@
                 android:paddingLeft="16dp"
                 android:paddingRight="16dp"
                 android:paddingTop="8dp"
-                android:src="@drawable/ic_keyboard_arrow_left" />
+                app:srcCompat="@drawable/ic_keyboard_arrow_left" />
 
             <EditText
                 android:id="@+id/advanced_setting_dialog_work_edit_text"
@@ -72,7 +73,7 @@
                 android:paddingLeft="16dp"
                 android:paddingRight="16dp"
                 android:paddingTop="8dp"
-                android:src="@drawable/ic_keyboard_arrow_right" />
+                app:srcCompat="@drawable/ic_keyboard_arrow_right" />
 
         </LinearLayout>
 
@@ -104,7 +105,7 @@
                 android:paddingLeft="16dp"
                 android:paddingRight="16dp"
                 android:paddingTop="8dp"
-                android:src="@drawable/ic_keyboard_arrow_left" />
+                app:srcCompat="@drawable/ic_keyboard_arrow_left" />
 
             <EditText
                 android:id="@+id/advanced_setting_dialog_rest_edit_text"
@@ -124,7 +125,7 @@
                 android:paddingLeft="16dp"
                 android:paddingRight="16dp"
                 android:paddingTop="8dp"
-                android:src="@drawable/ic_keyboard_arrow_right" />
+                app:srcCompat="@drawable/ic_keyboard_arrow_right" />
 
         </LinearLayout>
 

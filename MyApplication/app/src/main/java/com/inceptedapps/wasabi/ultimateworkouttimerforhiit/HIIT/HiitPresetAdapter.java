@@ -1,12 +1,10 @@
-package com.inceptedapps.wasabi.ultimateworkouttimerforhiit.HIIT;
+package com.inceptedapps.wasabi.ultimateworkouttimerforhiit.hiit;
 
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
-import android.support.v7.widget.CardView;
-import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,13 +12,12 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.inceptedapps.wasabi.ultimateworkouttimerforhiit.Activities.HiitTimerActivity;
-import com.inceptedapps.wasabi.ultimateworkouttimerforhiit.Activities.MainActivity;
+import com.inceptedapps.wasabi.ultimateworkouttimerforhiit.activities.HiitTimerActivity;
 import com.inceptedapps.wasabi.ultimateworkouttimerforhiit.R;
 
-import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 
+import androidx.recyclerview.widget.RecyclerView;
 import io.realm.Realm;
 import io.realm.RealmResults;
 

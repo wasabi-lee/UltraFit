@@ -1,24 +1,23 @@
-package com.inceptedapps.wasabi.ultimateworkouttimerforhiit.Activities;
+package com.inceptedapps.wasabi.ultimateworkouttimerforhiit.activities;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.preference.Preference;
-import android.preference.PreferenceFragment;
-import android.preference.PreferenceManager;
-import android.preference.PreferenceScreen;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.inceptedapps.wasabi.ultimateworkouttimerforhiit.R;
 
+import androidx.preference.Preference;
+import androidx.preference.PreferenceFragmentCompat;
+import androidx.preference.PreferenceManager;
+
 /**
  * Created by Wasabi on 5/4/2016.
  */
 
-public class SettingsFragment extends PreferenceFragment implements SharedPreferences.OnSharedPreferenceChangeListener, Preference.OnPreferenceClickListener{
+public class SettingsFragment extends PreferenceFragmentCompat implements SharedPreferences.OnSharedPreferenceChangeListener, Preference.OnPreferenceClickListener{
 
     OnThemeChangedListener mCallback;
     private static final int TICK_REQUEST_CODE = 45655;
@@ -77,6 +76,11 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     }
 
     @Override
+    public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
+
+    }
+
+    @Override
     public boolean onPreferenceClick(Preference preference) {
         String key = preference.getKey();
         if (key.equals(getResources().getString(R.string.SHARED_PREF_TICK_SOUND_SELECTION_KEY))) {
@@ -117,7 +121,10 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
 
     private void changePreference(String key, int value, String name) {
         Preference pref = findPreference(key);
-        SharedPreferences.Editor editor = pref.getEditor();
+
+
+
+        SharedPreferences.Editor editor = androidx.preference.PreferenceManager.getDefaultSharedPreferences(getContext()).edit();
         editor.putInt(key, value);
         editor.commit();
         pref.setSummary(name);

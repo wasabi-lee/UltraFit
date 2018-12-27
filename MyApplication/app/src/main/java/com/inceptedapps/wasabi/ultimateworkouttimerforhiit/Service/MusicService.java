@@ -1,4 +1,4 @@
-package com.inceptedapps.wasabi.ultimateworkouttimerforhiit.Service;
+package com.inceptedapps.wasabi.ultimateworkouttimerforhiit.service;
 
 import android.app.Service;
 import android.content.ContentUris;
@@ -17,10 +17,10 @@ import android.support.annotation.Nullable;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
-import com.inceptedapps.wasabi.ultimateworkouttimerforhiit.Activities.MainActivity;
-import com.inceptedapps.wasabi.ultimateworkouttimerforhiit.MusicSystem.Song;
-import com.inceptedapps.wasabi.ultimateworkouttimerforhiit.MusicSystem.SongSingleton;
-import com.inceptedapps.wasabi.ultimateworkouttimerforhiit.PrivateClasses.IsPremiumSingleton;
+import com.inceptedapps.wasabi.ultimateworkouttimerforhiit.activities.MainActivity;
+import com.inceptedapps.wasabi.ultimateworkouttimerforhiit.music.Song;
+import com.inceptedapps.wasabi.ultimateworkouttimerforhiit.music.SongSingleton;
+import com.inceptedapps.wasabi.ultimateworkouttimerforhiit.custom.IsPremiumSingleton;
 
 import java.util.ArrayList;
 import java.util.Random;

@@ -1,4 +1,4 @@
-package com.inceptedapps.wasabi.ultimateworkouttimerforhiit.PrivateClasses;
+package com.inceptedapps.wasabi.ultimateworkouttimerforhiit.custom;
 
 import android.content.Context;
 import android.content.DialogInterface;
@@ -8,7 +8,6 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
-import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
@@ -16,11 +15,13 @@ import android.widget.Toast;
 
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.inceptedapps.wasabi.ultimateworkouttimerforhiit.Activities.MainActivity;
+import com.inceptedapps.wasabi.ultimateworkouttimerforhiit.activities.MainActivity;
 import com.inceptedapps.wasabi.ultimateworkouttimerforhiit.R;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+
+import androidx.appcompat.app.AlertDialog;
 
 /**
  * Created by Wasabi on 8/13/2016.

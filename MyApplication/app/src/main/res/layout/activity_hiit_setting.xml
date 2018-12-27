@@ -7,12 +7,12 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".Activities.HiitSettingActivity">
+    tools:context=".activities.HiitSettingActivity">
 
     <android.support.v7.widget.Toolbar
         android:id="@+id/hiit_timer_toolbar"
         android:layout_width="match_parent"
-        android:layout_height="?android:attr/actionBarSize"
+        android:layout_height="?attr/actionBarSize"
         android:layout_gravity="top"
         android:background="?attr/colorPrimary"
         android:elevation="4dp"
@@ -66,7 +66,7 @@
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="0.3"
-                            android:src="@drawable/ic_keyboard_arrow_left" />
+                            app:srcCompat="@drawable/ic_keyboard_arrow_left" />
 
                         <EditText
                             android:id="@+id/hitt_timer_setting_warmup_edit"
@@ -85,7 +85,7 @@
                             android:layout_height="wrap_content"
                             android:layout_weight="0.3"
                             android:maxLength="5"
-                            android:src="@drawable/ic_keyboard_arrow_right" />
+                            app:srcCompat="@drawable/ic_keyboard_arrow_right" />
 
                     </LinearLayout>
                 </LinearLayout>
@@ -137,7 +137,7 @@
                                     android:layout_width="0dp"
                                     android:layout_height="wrap_content"
                                     android:layout_weight="0.3"
-                                    android:src="@drawable/ic_keyboard_arrow_left" />
+                                    app:srcCompat="@drawable/ic_keyboard_arrow_left" />
 
                                 <EditText
                                     android:id="@+id/hitt_timer_setting_work_edit"
@@ -155,7 +155,7 @@
                                     android:layout_width="0dp"
                                     android:layout_height="wrap_content"
                                     android:layout_weight="0.3"
-                                    android:src="@drawable/ic_keyboard_arrow_right" />
+                                    app:srcCompat="@drawable/ic_keyboard_arrow_right" />
 
                             </LinearLayout>
                         </LinearLayout>
@@ -188,7 +188,7 @@
                                     android:layout_width="0dp"
                                     android:layout_height="wrap_content"
                                     android:layout_weight="0.3"
-                                    android:src="@drawable/ic_keyboard_arrow_left" />
+                                    app:srcCompat="@drawable/ic_keyboard_arrow_left" />
 
                                 <EditText
                                     android:id="@+id/hitt_timer_setting_rest_edit"
@@ -206,7 +206,7 @@
                                     android:layout_width="0dp"
                                     android:layout_height="wrap_content"
                                     android:layout_weight="0.3"
-                                    android:src="@drawable/ic_keyboard_arrow_right" />
+                                    app:srcCompat="@drawable/ic_keyboard_arrow_right" />
 
                             </LinearLayout>
                         </LinearLayout>
@@ -239,7 +239,7 @@
                                     android:layout_width="0dp"
                                     android:layout_height="wrap_content"
                                     android:layout_weight="0.3"
-                                    android:src="@drawable/ic_keyboard_arrow_left" />
+                                    app:srcCompat="@drawable/ic_keyboard_arrow_left" />
 
                                 <EditText
                                     android:id="@+id/hitt_timer_setting_reps_edit"
@@ -256,7 +256,7 @@
                                     android:layout_width="0dp"
                                     android:layout_height="wrap_content"
                                     android:layout_weight="0.3"
-                                    android:src="@drawable/ic_keyboard_arrow_right" />
+                                    app:srcCompat="@drawable/ic_keyboard_arrow_right" />
 
                             </LinearLayout>
                         </LinearLayout>
@@ -269,7 +269,7 @@
                         android:layout_height="wrap_content"
                         android:layout_gravity="right"
                         android:padding="6dp"
-                        android:src="@drawable/ic_create" />
+                        app:srcCompat="@drawable/ic_create" />
 
                 </FrameLayout>
 
@@ -309,7 +309,7 @@
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="0.3"
-                            android:src="@drawable/ic_keyboard_arrow_left" />
+                            app:srcCompat="@drawable/ic_keyboard_arrow_left" />
 
                         <EditText
                             android:id="@+id/hitt_timer_setting_cooldown_edit"
@@ -326,7 +326,7 @@
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="0.3"
-                            android:src="@drawable/ic_keyboard_arrow_right" />
+                            app:srcCompat="@drawable/ic_keyboard_arrow_right" />
 
                     </LinearLayout>
 

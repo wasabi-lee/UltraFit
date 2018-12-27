@@ -23,7 +23,7 @@
             android:layout_height="match_parent"
             android:gravity="center"
             android:orientation="horizontal"
-            tools:context=".Activities.HiitTimerActivity">
+            tools:context=".activities.HiitTimerActivity">
 
             <FrameLayout
                 android:id="@+id/frameLayout"
@@ -37,7 +37,7 @@
                     android:layout_gravity="left|center_vertical"
                     android:clickable="true"
                     android:padding="5dp"
-                    android:src="@drawable/arrow_gray" />
+                    ads:srcCompat="@drawable/arrow_gray" />
 
                 <LinearLayout
                     android:layout_width="wrap_content"
@@ -236,7 +236,7 @@
                         android:paddingLeft="16dp"
                         android:paddingRight="16dp"
                         android:paddingTop="8dp"
-                        android:src="@drawable/ic_skip_previous" />
+                        ads:srcCompat="@drawable/ic_skip_previous" />
 
                     <ImageView
                         android:id="@+id/drawer_play_pause_icon"
@@ -246,7 +246,7 @@
                         android:paddingLeft="16dp"
                         android:paddingRight="16dp"
                         android:paddingTop="8dp"
-                        android:src="@drawable/ic_pause" />
+                        ads:srcCompat="@drawable/ic_pause" />
 
                     <ImageView
                         android:id="@+id/drawer_skip_next_icon"
@@ -257,7 +257,7 @@
                         android:paddingLeft="16dp"
                         android:paddingRight="16dp"
                         android:paddingTop="8dp"
-                        android:src="@drawable/ic_skip_next" />
+                        ads:srcCompat="@drawable/ic_skip_next" />
 
                 </LinearLayout>
 
@@ -278,7 +278,7 @@
                         android:paddingLeft="16dp"
                         android:paddingRight="16dp"
                         android:paddingTop="8dp"
-                        android:src="@drawable/ic_action_playback_repeat" />
+                        ads:srcCompat="@drawable/ic_action_playback_repeat" />
 
                     <LinearLayout
                         android:layout_width="0dp"
@@ -327,7 +327,7 @@
             android:id="@+id/no_music_background"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:src="@android:color/darker_gray" />
+            ads:srcCompat="@android:color/darker_gray" />
 
         <TextView
             android:id="@+id/no_music_text"

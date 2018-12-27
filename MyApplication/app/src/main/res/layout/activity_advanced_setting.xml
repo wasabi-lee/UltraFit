@@ -6,12 +6,12 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:id="@+id/advanced_setting_parent_linear"
-    tools:context=".Activities.AdvancedSettingActivity">
+    tools:context=".activities.AdvancedSettingActivity">
 
     <android.support.v7.widget.Toolbar
         android:id="@+id/advanced_setting_toolbar"
         android:layout_width="match_parent"
-        android:layout_height="?android:attr/actionBarSize"
+        android:layout_height="?attr/actionBarSize"
         android:layout_gravity="top"
         app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
         app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
@@ -42,13 +42,13 @@
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="?android:attr/actionBarSize"
+                android:layout_height="?attr/actionBarSize"
                 android:alpha=".7"
                 android:background="?attr/colorPrimary"></LinearLayout>
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="?android:attr/actionBarSize"
+                android:layout_height="?attr/actionBarSize"
                 android:gravity="center"
                 android:orientation="horizontal">
 
@@ -60,7 +60,7 @@
                     android:layout_marginRight="30dp"
                     android:background="?roundButton"
                     android:padding="6dp"
-                    android:src="@drawable/ic_remove_small" />
+                    app:srcCompat="@drawable/ic_remove_small" />
 
                 <TextView
                     android:id="@+id/advanced_setting_rep_text_view"
@@ -79,7 +79,7 @@
                     android:layout_marginRight="30dp"
                     android:background="?roundButton"
                     android:padding="6dp"
-                    android:src="@drawable/ic_add_small" />
+                    app:srcCompat="@drawable/ic_add_small" />
 
             </LinearLayout>
 

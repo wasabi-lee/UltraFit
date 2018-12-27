@@ -1,9 +1,9 @@
-package com.inceptedapps.wasabi.ultimateworkouttimerforhiit.PrivateClasses;
+package com.inceptedapps.wasabi.ultimateworkouttimerforhiit.custom;
 
-import android.app.Activity;
-import android.content.Intent;
 
 import com.inceptedapps.wasabi.ultimateworkouttimerforhiit.R;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 /**
  * Created by Wasabi on 5/4/2016.
@@ -25,7 +25,7 @@ public class ThemeUtils {
         return mTheme;
     }
 
-    public static void onActivityCreateSetTheme(Activity activity){
+    public static void onActivityCreateSetTheme(AppCompatActivity activity){
         switch (mTheme){
             case TEAL_BLUE:
                 activity.setTheme(R.style.AppTheme);
