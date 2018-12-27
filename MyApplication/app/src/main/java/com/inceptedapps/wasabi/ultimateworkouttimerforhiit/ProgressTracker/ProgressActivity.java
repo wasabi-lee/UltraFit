@@ -1,51 +1,85 @@
-package com.inceptedapps.wasabi.ultimateworkouttimerforhiit.progress;
+package com.inceptedapps.wasabi.ultimateworkouttimerforhiit.ProgressTracker;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
+import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
+import android.content.pm.Signature;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.net.Uri;
+import android.os.SystemClock;
 import android.preference.PreferenceManager;
+import android.support.design.widget.FloatingActionButton;
+import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
+import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ExpandableListView;
+import android.widget.ListView;
 import android.widget.TextView;
-
+import android.widget.Toast;
+//
+//import com.facebook.CallbackManager;
+//import com.facebook.FacebookCallback;
+//import com.facebook.FacebookException;
+//import com.facebook.FacebookSdk;
+//import com.facebook.login.LoginManager;
+//import com.facebook.login.LoginResult;
+//import com.facebook.share.ShareApi;
+//import com.facebook.share.Sharer;
+//import com.facebook.share.model.ShareLinkContent;
+//import com.facebook.share.model.SharePhoto;
+//import com.facebook.share.model.SharePhotoContent;
+//import com.facebook.share.widget.ShareButton;
+//import com.facebook.share.widget.ShareDialog;
 import com.github.mikephil.charting.charts.LineChart;
-import com.github.mikephil.charting.components.Description;
 import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
-import com.github.mikephil.charting.formatter.IFillFormatter;
+import com.github.mikephil.charting.formatter.FillFormatter;
 import com.github.mikephil.charting.highlight.Highlight;
 import com.github.mikephil.charting.interfaces.dataprovider.LineDataProvider;
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
 import com.github.mikephil.charting.listener.OnChartValueSelectedListener;
-import com.inceptedapps.wasabi.ultimateworkouttimerforhiit.custom.ExpandableListAdapter;
-import com.inceptedapps.wasabi.ultimateworkouttimerforhiit.custom.ThemeUtils;
-import com.inceptedapps.wasabi.ultimateworkouttimerforhiit.custom.TimerUtils;
+import com.inceptedapps.wasabi.ultimateworkouttimerforhiit.Activities.HiitSettingActivity;
+import com.inceptedapps.wasabi.ultimateworkouttimerforhiit.PrivateClasses.ExpandableListAdapter;
+import com.inceptedapps.wasabi.ultimateworkouttimerforhiit.PrivateClasses.ThemeUtils;
+import com.inceptedapps.wasabi.ultimateworkouttimerforhiit.PrivateClasses.TimerUtils;
 import com.inceptedapps.wasabi.ultimateworkouttimerforhiit.R;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
 import io.realm.DynamicRealm;
 import io.realm.Realm;
 import io.realm.RealmConfiguration;
@@ -100,10 +134,8 @@ public class ProgressActivity extends AppCompatActivity implements OnChartValueS
     private void initializeChart() {
 
         mLineChart.setViewPortOffsets(70, 0, 40, 60);
-        Description desc = new Description();
-        desc.setText(getResources().getString(R.string.progress_x_label_desc));
-        desc.setTextColor(Color.WHITE);
-        mLineChart.setDescription(desc);
+        mLineChart.setDescription(getResources().getString(R.string.progress_x_label_desc));
+        mLineChart.setDescriptionColor(Color.WHITE);
         mLineChart.setTouchEnabled(true);
         mLineChart.setDragEnabled(true);
         mLineChart.setScaleEnabled(true);
@@ -113,6 +145,7 @@ public class ProgressActivity extends AppCompatActivity implements OnChartValueS
         XAxis x = mLineChart.getXAxis();
         x.setEnabled(true);
         x.setPosition(XAxis.XAxisPosition.BOTTOM);
+        x.setSpaceBetweenLabels(0);
         x.setTextColor(Color.WHITE);
         x.setAvoidFirstLastClipping(true);
         x.setDrawGridLines(true);
@@ -150,17 +183,16 @@ public class ProgressActivity extends AppCompatActivity implements OnChartValueS
         super.onActivityResult(requestCode, responseCode, data);
     }
 
-
     @Override
-    public void onValueSelected(Entry e, Highlight h) {
+    public void onValueSelected(Entry e, int dataSetIndex, Highlight h) {
 
         if (footerView.getVisibility() == View.VISIBLE) {
             expandableLv.removeFooterView(footerView);
         }
 
-        if (logList.get((int) e.getX()) == null) {
+        if (logList.get(e.getXIndex()) == null) {
             c.setTime(new Date());
-            c.add(Calendar.DATE, (int) e.getX() - (logList.size() - 1));
+            c.add(Calendar.DATE, e.getXIndex() - (logList.size() - 1));
 
             clearDataset();
 
@@ -168,7 +200,7 @@ public class ProgressActivity extends AppCompatActivity implements OnChartValueS
             mNoResultTextView.setVisibility(View.VISIBLE);
             mNoResultTextView.setText(getResources().getString(R.string.progress_no_workout_data));
         } else {
-            selectedWorkoutLog = logList.get((int) e.getX());
+            selectedWorkoutLog = logList.get(e.getXIndex());
             Date date = selectedWorkoutLog.getmDate();
             mDateTextView.setText(detailDateFormat.format(date));
 
@@ -179,7 +211,7 @@ public class ProgressActivity extends AppCompatActivity implements OnChartValueS
 
             } else {
 
-//                Log.d("SELECTED VAL", e.getVal()+"");
+                Log.d("SELECTED VAL", e.getVal()+"");
 
                 expandableLv.addFooterView(footerView);
 
@@ -266,6 +298,7 @@ public class ProgressActivity extends AppCompatActivity implements OnChartValueS
                 mAdapter.notifyDataSetChanged();
 
 
+
             }
         }
     }
@@ -294,7 +327,7 @@ public class ProgressActivity extends AppCompatActivity implements OnChartValueS
             for (int i = 0; i < count - results.size(); i++) {
                 logList.add(null);
             }
-            if (results.size() > count) {
+            if (results.size() > count){
                 for (int i = results.size() - count; i < results.size(); i++) {
                     logList.add(copyObjectsFromDB(results, i));
                 }
@@ -307,12 +340,12 @@ public class ProgressActivity extends AppCompatActivity implements OnChartValueS
             Date today = new Date();
             String todayString = simpleDateFormat.format(today);
 
-            if (!simpleDateFormat.format(logList.get(logList.size() - 1).getmDate()).equals(todayString)) {
+            if (!simpleDateFormat.format(logList.get(logList.size()-1).getmDate()).equals(todayString)){
                 logList.remove(0);
                 logList.add(null);
             }
 
-            ArrayList<String> xVals = new ArrayList<>();
+                ArrayList<String> xVals = new ArrayList<>();
             for (int i = 0; i < count; i++) {
                 if (logList.get(i) != null) {
                     xVals.add(simpleDateFormat.format(logList.get(i).getmDate()));
@@ -338,7 +371,7 @@ public class ProgressActivity extends AppCompatActivity implements OnChartValueS
             }
 
             LineDataSet set1 = new LineDataSet(vals1, "Total workout time");
-//            set1.setDrawCubic(true);
+            set1.setDrawCubic(true);
             set1.setCubicIntensity(0.2f);
             set1.setDrawFilled(true);
             set1.setDrawCircles(false);
@@ -351,14 +384,14 @@ public class ProgressActivity extends AppCompatActivity implements OnChartValueS
             set1.setFillColor(Color.WHITE);
             set1.setFillAlpha(100);
             set1.setDrawHorizontalHighlightIndicator(false);
-            set1.setFillFormatter(new IFillFormatter() {
+            set1.setFillFormatter(new FillFormatter() {
                 @Override
                 public float getFillLinePosition(ILineDataSet dataSet, LineDataProvider dataProvider) {
                     return -10;
                 }
             });
 
-            LineData data = new LineData(set1);
+            LineData data = new LineData(xVals, set1);
             data.setValueTextSize(9f);
             data.setDrawValues(false);
 
@@ -381,7 +414,7 @@ public class ProgressActivity extends AppCompatActivity implements OnChartValueS
             for (int i = 0; i < workoutLog.getTimerLogs().size(); i++) {
                 totalWorkoutTimeOfTheDay += (workoutLog.getTimerLogs().get(i).getTotal());
             }
-            return new Entry(totalWorkoutTimeOfTheDay / 60, index);
+            return new Entry(totalWorkoutTimeOfTheDay/60, index);
         } else {
             return new Entry(0, index);
         }

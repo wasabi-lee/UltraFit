@@ -1,4 +1,4 @@
-package com.inceptedapps.wasabi.ultimateworkouttimerforhiit.hiit;
+package com.inceptedapps.wasabi.ultimateworkouttimerforhiit.HIIT;
 
 import java.util.ArrayList;
 

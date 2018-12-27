@@ -1,4 +1,4 @@
-package com.inceptedapps.wasabi.ultimateworkouttimerforhiit.activities;
+package com.inceptedapps.wasabi.ultimateworkouttimerforhiit.Activities;
 
 import android.Manifest;
 import android.app.ProgressDialog;
@@ -15,24 +15,24 @@ import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.provider.MediaStore;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.inceptedapps.wasabi.ultimateworkouttimerforhiit.music.CurrentMusicAdapter;
-import com.inceptedapps.wasabi.ultimateworkouttimerforhiit.music.Song;
-import com.inceptedapps.wasabi.ultimateworkouttimerforhiit.music.SongSingleton;
-import com.inceptedapps.wasabi.ultimateworkouttimerforhiit.custom.ThemeUtils;
+import com.inceptedapps.wasabi.ultimateworkouttimerforhiit.MusicSystem.CurrentMusicAdapter;
+import com.inceptedapps.wasabi.ultimateworkouttimerforhiit.MusicSystem.Song;
+import com.inceptedapps.wasabi.ultimateworkouttimerforhiit.MusicSystem.SongSingleton;
+import com.inceptedapps.wasabi.ultimateworkouttimerforhiit.PrivateClasses.ThemeUtils;
 import com.inceptedapps.wasabi.ultimateworkouttimerforhiit.R;
 
 import java.util.ArrayList;
-
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
+import java.util.IllegalFormatCodePointException;
 
 public class CurrentMusicListActivity extends AppCompatActivity {
 

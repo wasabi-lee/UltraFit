@@ -4,7 +4,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".activities.MusicSettingActivity">
+    tools:context=".Activities.MusicSettingActivity">
 
     <android.support.v7.widget.Toolbar
         android:id="@+id/music_setting_toolbar"
@@ -12,7 +12,7 @@
         android:background="?attr/colorPrimary"
         app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
         app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
-        android:layout_height="?attr/actionBarSize"/>
+        android:layout_height="?android:attr/actionBarSize"/>
 
     <android.support.v7.widget.RecyclerView
         android:layout_below="@+id/music_setting_toolbar"

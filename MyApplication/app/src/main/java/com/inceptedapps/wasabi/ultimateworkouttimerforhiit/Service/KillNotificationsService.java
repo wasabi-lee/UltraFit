@@ -1,4 +1,4 @@
-package com.inceptedapps.wasabi.ultimateworkouttimerforhiit.service;
+package com.inceptedapps.wasabi.ultimateworkouttimerforhiit.Service;
 
 import android.app.NotificationManager;
 import android.app.Service;

@@ -1,4 +1,4 @@
-package com.inceptedapps.wasabi.ultimateworkouttimerforhiit.custom;
+package com.inceptedapps.wasabi.ultimateworkouttimerforhiit.PrivateClasses;
 
 import android.content.Context;
 import android.view.LayoutInflater;

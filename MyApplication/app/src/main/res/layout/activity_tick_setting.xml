@@ -4,12 +4,12 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    tools:context="com.inceptedapps.wasabi.ultimateworkouttimerforhiit.activities.TickSettingActivity">
+    tools:context="com.inceptedapps.wasabi.ultimateworkouttimerforhiit.Activities.TickSettingActivity">
 
     <android.support.v7.widget.Toolbar
         android:id="@+id/tick_toolbar"
         android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
+        android:layout_height="?android:attr/actionBarSize"
         android:layout_gravity="top"
         app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
         app:popupTheme="@style/ThemeOverlay.AppCompat.Light"

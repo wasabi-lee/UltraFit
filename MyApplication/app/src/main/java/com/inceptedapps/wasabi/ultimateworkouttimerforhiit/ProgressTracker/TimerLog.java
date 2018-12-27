@@ -1,4 +1,4 @@
-package com.inceptedapps.wasabi.ultimateworkouttimerforhiit.progress;
+package com.inceptedapps.wasabi.ultimateworkouttimerforhiit.ProgressTracker;
 
 import io.realm.RealmObject;
 

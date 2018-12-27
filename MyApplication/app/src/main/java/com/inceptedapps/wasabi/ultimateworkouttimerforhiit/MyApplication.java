@@ -16,7 +16,7 @@ public class MyApplication extends Application{
     @Override
     public void onCreate() {
         super.onCreate();
-        RealmConfiguration realmConfiguration = new RealmConfiguration.Builder()
+        RealmConfiguration realmConfiguration = new RealmConfiguration.Builder(this)
                 .schemaVersion(0)
                 .build();
         try{

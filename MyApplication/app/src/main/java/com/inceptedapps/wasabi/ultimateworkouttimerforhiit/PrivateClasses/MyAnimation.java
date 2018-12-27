@@ -1,6 +1,7 @@
-package com.inceptedapps.wasabi.ultimateworkouttimerforhiit.custom;
+package com.inceptedapps.wasabi.ultimateworkouttimerforhiit.PrivateClasses;
 
 import android.view.animation.AlphaAnimation;
+import android.view.animation.Animation;
 import android.view.animation.Transformation;
 import android.widget.ProgressBar;
 

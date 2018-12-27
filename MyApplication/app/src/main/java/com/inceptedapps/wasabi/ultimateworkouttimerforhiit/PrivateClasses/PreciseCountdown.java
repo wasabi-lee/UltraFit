@@ -1,4 +1,6 @@
-package com.inceptedapps.wasabi.ultimateworkouttimerforhiit.custom;
+package com.inceptedapps.wasabi.ultimateworkouttimerforhiit.PrivateClasses;
+
+import android.util.Log;
 
 import java.util.Timer;
 import java.util.TimerTask;

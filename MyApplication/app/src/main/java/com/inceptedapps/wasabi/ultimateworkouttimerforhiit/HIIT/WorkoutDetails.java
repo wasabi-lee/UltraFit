@@ -1,4 +1,4 @@
-package com.inceptedapps.wasabi.ultimateworkouttimerforhiit.hiit;
+package com.inceptedapps.wasabi.ultimateworkouttimerforhiit.HIIT;
 
 /**
  * Created by Wasabi on 4/24/2016.

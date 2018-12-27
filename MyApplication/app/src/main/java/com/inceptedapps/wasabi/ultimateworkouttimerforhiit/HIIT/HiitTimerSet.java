@@ -1,4 +1,4 @@
-package com.inceptedapps.wasabi.ultimateworkouttimerforhiit.hiit;
+package com.inceptedapps.wasabi.ultimateworkouttimerforhiit.HIIT;
 
 import io.realm.RealmObject;
 import io.realm.annotations.RealmClass;

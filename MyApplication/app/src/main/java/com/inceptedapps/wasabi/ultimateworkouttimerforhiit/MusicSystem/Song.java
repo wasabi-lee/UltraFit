@@ -1,5 +1,6 @@
-package com.inceptedapps.wasabi.ultimateworkouttimerforhiit.music;
+package com.inceptedapps.wasabi.ultimateworkouttimerforhiit.MusicSystem;
 
+import android.graphics.Bitmap;
 import android.net.Uri;
 
 /**

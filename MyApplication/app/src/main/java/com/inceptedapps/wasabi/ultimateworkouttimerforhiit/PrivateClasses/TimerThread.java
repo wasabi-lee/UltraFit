@@ -1,6 +1,7 @@
-package com.inceptedapps.wasabi.ultimateworkouttimerforhiit.custom;
+package com.inceptedapps.wasabi.ultimateworkouttimerforhiit.PrivateClasses;
 
 import android.os.Handler;
+import android.os.SystemClock;
 import android.util.Log;
 
 /**
