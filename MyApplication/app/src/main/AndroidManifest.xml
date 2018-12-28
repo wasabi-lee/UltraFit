@@ -18,7 +18,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".Activities.MainActivity"
+            android:name=".activities.MainActivity"
             android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -27,29 +27,29 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".Activities.HiitSettingActivity"
+            android:name=".activities.HiitSettingActivity"
             android:label="Create your timer" />
         <activity
-            android:name=".Activities.HiitTimerActivity"
+            android:name=".activities.HiitTimerActivity"
             android:launchMode="singleTask" />
-        <activity android:name=".HIIT.HiitTimerListActivity" />
-        <activity android:name=".ProgressTracker.ProgressActivity" />
+        <activity android:name=".hiit.HiitTimerListActivity" />
+        <activity android:name=".progress.ProgressActivity" />
         <activity
-            android:name=".Activities.AdvancedSettingActivity"
+            android:name=".activities.AdvancedSettingActivity"
             android:screenOrientation="portrait" />
-        <activity android:name=".Activities.MusicSettingActivity" />
+        <activity android:name=".activities.MusicSettingActivity" />
         <activity
-            android:name=".Activities.CurrentMusicListActivity"
+            android:name=".activities.CurrentMusicListActivity"
             android:label="@string/title_activity_current_music_list"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme" />
 
-        <service android:name=".Service.MusicService" />
-        <service android:name=".Service.KillNotificationsService" />
+        <service android:name=".service.MusicService" />
+        <service android:name=".service.KillNotificationsService" />
 
-        <activity android:name=".Activities.SettingsActivity" />
+        <activity android:name=".activities.SettingsActivity" />
         <activity android:name=".GoPremiumActivity" />
-        <activity android:name=".Activities.TickSettingActivity" />
+        <activity android:name=".activities.TickSettingActivity" />
     </application>
 
 </manifest>

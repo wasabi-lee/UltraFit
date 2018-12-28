@@ -1,18 +1,14 @@
-package com.inceptedapps.wasabi.ultimateworkouttimerforhiit.Activities;
+package com.inceptedapps.wasabi.ultimateworkouttimerforhiit.activities;
 
 import android.Manifest;
-import android.content.ContentResolver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.database.Cursor;
 import android.graphics.Color;
-import android.net.Uri;
 import android.os.Build;
 import android.preference.PreferenceManager;
-import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
@@ -33,16 +29,12 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.ads.AdRequest;
-import com.google.android.gms.ads.InterstitialAd;
 import com.inceptedapps.wasabi.ultimateworkouttimerforhiit.GoPremiumActivity;
-import com.inceptedapps.wasabi.ultimateworkouttimerforhiit.HIIT.HiitSingleton;
-import com.inceptedapps.wasabi.ultimateworkouttimerforhiit.HIIT.HiitTimerSet;
-import com.inceptedapps.wasabi.ultimateworkouttimerforhiit.MusicSystem.Song;
-import com.inceptedapps.wasabi.ultimateworkouttimerforhiit.MusicSystem.SongSingleton;
-import com.inceptedapps.wasabi.ultimateworkouttimerforhiit.PrivateClasses.IsPremiumSingleton;
-import com.inceptedapps.wasabi.ultimateworkouttimerforhiit.PrivateClasses.ThemeUtils;
-import com.inceptedapps.wasabi.ultimateworkouttimerforhiit.PrivateClasses.TimerUtils;
+import com.inceptedapps.wasabi.ultimateworkouttimerforhiit.hiit.HiitSingleton;
+import com.inceptedapps.wasabi.ultimateworkouttimerforhiit.hiit.HiitTimerSet;
+import com.inceptedapps.wasabi.ultimateworkouttimerforhiit.music.SongSingleton;
+import com.inceptedapps.wasabi.ultimateworkouttimerforhiit.custom.ThemeUtils;
+import com.inceptedapps.wasabi.ultimateworkouttimerforhiit.custom.TimerUtils;
 import com.inceptedapps.wasabi.ultimateworkouttimerforhiit.R;
 
 import java.util.concurrent.TimeUnit;

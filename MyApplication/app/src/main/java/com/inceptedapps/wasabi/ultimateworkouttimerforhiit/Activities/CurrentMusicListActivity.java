@@ -1,4 +1,4 @@
-package com.inceptedapps.wasabi.ultimateworkouttimerforhiit.Activities;
+package com.inceptedapps.wasabi.ultimateworkouttimerforhiit.activities;
 
 import android.Manifest;
 import android.app.ProgressDialog;
@@ -25,14 +25,13 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 
-import com.inceptedapps.wasabi.ultimateworkouttimerforhiit.MusicSystem.CurrentMusicAdapter;
-import com.inceptedapps.wasabi.ultimateworkouttimerforhiit.MusicSystem.Song;
-import com.inceptedapps.wasabi.ultimateworkouttimerforhiit.MusicSystem.SongSingleton;
-import com.inceptedapps.wasabi.ultimateworkouttimerforhiit.PrivateClasses.ThemeUtils;
+import com.inceptedapps.wasabi.ultimateworkouttimerforhiit.music.CurrentMusicAdapter;
+import com.inceptedapps.wasabi.ultimateworkouttimerforhiit.music.Song;
+import com.inceptedapps.wasabi.ultimateworkouttimerforhiit.music.SongSingleton;
+import com.inceptedapps.wasabi.ultimateworkouttimerforhiit.custom.ThemeUtils;
 import com.inceptedapps.wasabi.ultimateworkouttimerforhiit.R;
 
 import java.util.ArrayList;
-import java.util.IllegalFormatCodePointException;
 
 public class CurrentMusicListActivity extends AppCompatActivity {
 

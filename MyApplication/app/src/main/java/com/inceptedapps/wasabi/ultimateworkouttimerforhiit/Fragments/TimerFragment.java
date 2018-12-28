@@ -1,4 +1,4 @@
-package com.inceptedapps.wasabi.ultimateworkouttimerforhiit.Fragments;
+package com.inceptedapps.wasabi.ultimateworkouttimerforhiit.fragments;
 
 
 import android.app.Activity;
@@ -12,11 +12,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.inceptedapps.wasabi.ultimateworkouttimerforhiit.Activities.HiitTimerActivity;
-import com.inceptedapps.wasabi.ultimateworkouttimerforhiit.PrivateClasses.TimerThread;
+import com.inceptedapps.wasabi.ultimateworkouttimerforhiit.activities.HiitTimerActivity;
+import com.inceptedapps.wasabi.ultimateworkouttimerforhiit.custom.TimerThread;
 import com.inceptedapps.wasabi.ultimateworkouttimerforhiit.R;
-
-import java.util.HashMap;
 
 public class TimerFragment extends Fragment implements TimerThread.TimerActionCallback {
 

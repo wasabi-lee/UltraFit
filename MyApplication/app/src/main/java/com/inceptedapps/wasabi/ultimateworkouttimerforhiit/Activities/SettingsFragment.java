@@ -1,4 +1,4 @@
-package com.inceptedapps.wasabi.ultimateworkouttimerforhiit.Activities;
+package com.inceptedapps.wasabi.ultimateworkouttimerforhiit.activities;
 
 import android.app.Activity;
 import android.content.Context;

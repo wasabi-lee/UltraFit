@@ -1,4 +1,4 @@
-package com.inceptedapps.wasabi.ultimateworkouttimerforhiit.Activities;
+package com.inceptedapps.wasabi.ultimateworkouttimerforhiit.activities;
 
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -11,7 +11,6 @@ import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
@@ -21,14 +20,13 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.inceptedapps.wasabi.ultimateworkouttimerforhiit.HIIT.HiitAdvancedSettingAdapter;
-import com.inceptedapps.wasabi.ultimateworkouttimerforhiit.HIIT.WorkoutDetails;
-import com.inceptedapps.wasabi.ultimateworkouttimerforhiit.PrivateClasses.ThemeUtils;
-import com.inceptedapps.wasabi.ultimateworkouttimerforhiit.PrivateClasses.TimerUtils;
+import com.inceptedapps.wasabi.ultimateworkouttimerforhiit.custom.ThemeUtils;
+import com.inceptedapps.wasabi.ultimateworkouttimerforhiit.custom.TimerUtils;
 import com.inceptedapps.wasabi.ultimateworkouttimerforhiit.R;
+import com.inceptedapps.wasabi.ultimateworkouttimerforhiit.hiit.HiitAdvancedSettingAdapter;
+import com.inceptedapps.wasabi.ultimateworkouttimerforhiit.hiit.WorkoutDetails;
 
 import java.util.ArrayList;
-import java.util.concurrent.TimeUnit;
 
 public class AdvancedSettingActivity extends AppCompatActivity implements View.OnClickListener, View.OnFocusChangeListener {
 

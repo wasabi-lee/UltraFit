@@ -1,17 +1,12 @@
-package com.inceptedapps.wasabi.ultimateworkouttimerforhiit.Activities;
+package com.inceptedapps.wasabi.ultimateworkouttimerforhiit.activities;
 
 import android.content.Intent;
-import android.graphics.Color;
 import android.media.MediaPlayer;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
-import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
-import com.inceptedapps.wasabi.ultimateworkouttimerforhiit.PrivateClasses.SoundListAdapter;
+import com.inceptedapps.wasabi.ultimateworkouttimerforhiit.custom.SoundListAdapter;
 import com.inceptedapps.wasabi.ultimateworkouttimerforhiit.R;
 
 public class TickSettingActivity extends AppCompatActivity implements MediaPlayer.OnCompletionListener, SoundListAdapter.OnSoundSelectedListener {

@@ -1,8 +1,5 @@
-package com.inceptedapps.wasabi.ultimateworkouttimerforhiit.ProgressTracker;
+package com.inceptedapps.wasabi.ultimateworkouttimerforhiit.progress;
 
-import com.inceptedapps.wasabi.ultimateworkouttimerforhiit.HIIT.HiitTimerSet;
-
-import java.util.ArrayList;
 import java.util.Date;
 
 import io.realm.RealmList;

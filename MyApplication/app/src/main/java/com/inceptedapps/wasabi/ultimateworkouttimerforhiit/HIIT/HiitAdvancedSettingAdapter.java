@@ -1,4 +1,4 @@
-package com.inceptedapps.wasabi.ultimateworkouttimerforhiit.HIIT;
+package com.inceptedapps.wasabi.ultimateworkouttimerforhiit.hiit;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;

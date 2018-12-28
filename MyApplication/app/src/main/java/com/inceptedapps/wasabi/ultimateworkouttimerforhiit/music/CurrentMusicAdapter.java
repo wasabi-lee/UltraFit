@@ -1,4 +1,4 @@
-package com.inceptedapps.wasabi.ultimateworkouttimerforhiit.MusicSystem;
+package com.inceptedapps.wasabi.ultimateworkouttimerforhiit.music;
 
 import android.content.Context;
 import android.content.SharedPreferences;

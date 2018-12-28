@@ -1,7 +1,6 @@
-package com.inceptedapps.wasabi.ultimateworkouttimerforhiit.PrivateClasses;
+package com.inceptedapps.wasabi.ultimateworkouttimerforhiit.custom;
 
 import android.app.Activity;
-import android.content.Intent;
 
 import com.inceptedapps.wasabi.ultimateworkouttimerforhiit.R;
 

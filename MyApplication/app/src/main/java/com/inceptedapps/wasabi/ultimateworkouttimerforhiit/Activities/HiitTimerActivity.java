@@ -1,4 +1,4 @@
-package com.inceptedapps.wasabi.ultimateworkouttimerforhiit.Activities;
+package com.inceptedapps.wasabi.ultimateworkouttimerforhiit.activities;
 
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -20,12 +20,12 @@ import android.os.IBinder;
 import android.os.Vibrator;
 import android.preference.PreferenceManager;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.app.NotificationCompat;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
@@ -41,30 +41,28 @@ import android.widget.Toast;
 
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
-import com.inceptedapps.wasabi.ultimateworkouttimerforhiit.Fragments.TimerFragment;
-import com.inceptedapps.wasabi.ultimateworkouttimerforhiit.HIIT.HiitSingleton;
-import com.inceptedapps.wasabi.ultimateworkouttimerforhiit.HIIT.HiitTimerSet;
-import com.inceptedapps.wasabi.ultimateworkouttimerforhiit.MusicSystem.MusicDrawerListAdapter;
-import com.inceptedapps.wasabi.ultimateworkouttimerforhiit.MusicSystem.Song;
-import com.inceptedapps.wasabi.ultimateworkouttimerforhiit.MusicSystem.SongSingleton;
-import com.inceptedapps.wasabi.ultimateworkouttimerforhiit.PrivateClasses.MyAnimation;
-import com.inceptedapps.wasabi.ultimateworkouttimerforhiit.PrivateClasses.MySoundPoolHelper;
-import com.inceptedapps.wasabi.ultimateworkouttimerforhiit.PrivateClasses.RateDialogHelper;
-import com.inceptedapps.wasabi.ultimateworkouttimerforhiit.PrivateClasses.ThemeUtils;
-import com.inceptedapps.wasabi.ultimateworkouttimerforhiit.PrivateClasses.TimerUtils;
-import com.inceptedapps.wasabi.ultimateworkouttimerforhiit.ProgressTracker.TimerLog;
-import com.inceptedapps.wasabi.ultimateworkouttimerforhiit.ProgressTracker.WorkoutLog;
+import com.inceptedapps.wasabi.ultimateworkouttimerforhiit.fragments.TimerFragment;
+import com.inceptedapps.wasabi.ultimateworkouttimerforhiit.hiit.HiitSingleton;
+import com.inceptedapps.wasabi.ultimateworkouttimerforhiit.hiit.HiitTimerSet;
+import com.inceptedapps.wasabi.ultimateworkouttimerforhiit.music.MusicDrawerListAdapter;
+import com.inceptedapps.wasabi.ultimateworkouttimerforhiit.music.Song;
+import com.inceptedapps.wasabi.ultimateworkouttimerforhiit.music.SongSingleton;
+import com.inceptedapps.wasabi.ultimateworkouttimerforhiit.custom.MyAnimation;
+import com.inceptedapps.wasabi.ultimateworkouttimerforhiit.custom.MySoundPoolHelper;
+import com.inceptedapps.wasabi.ultimateworkouttimerforhiit.custom.RateDialogHelper;
+import com.inceptedapps.wasabi.ultimateworkouttimerforhiit.custom.ThemeUtils;
+import com.inceptedapps.wasabi.ultimateworkouttimerforhiit.custom.TimerUtils;
+import com.inceptedapps.wasabi.ultimateworkouttimerforhiit.progress.TimerLog;
+import com.inceptedapps.wasabi.ultimateworkouttimerforhiit.progress.WorkoutLog;
 import com.inceptedapps.wasabi.ultimateworkouttimerforhiit.R;
-import com.inceptedapps.wasabi.ultimateworkouttimerforhiit.Service.KillNotificationsService;
-import com.inceptedapps.wasabi.ultimateworkouttimerforhiit.Service.MusicService;
-import com.inceptedapps.wasabi.ultimateworkouttimerforhiit.Service.MusicService.MusicBinder;
+import com.inceptedapps.wasabi.ultimateworkouttimerforhiit.service.KillNotificationsService;
+import com.inceptedapps.wasabi.ultimateworkouttimerforhiit.service.MusicService;
 import com.squareup.picasso.Picasso;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.Random;
 
 import io.realm.Realm;
 import io.realm.RealmList;
@@ -204,7 +202,7 @@ public class HiitTimerActivity extends AppCompatActivity implements View.OnClick
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
             if (mSongList.size() != 0) {
-                MusicBinder binder = (MusicBinder) service;
+                MusicService.MusicBinder binder = (MusicService.MusicBinder) service;
                 musicService = binder.getService();
                 musicBound = true;
                 Log.d(getClass().getSimpleName(), "Service tracker : Service is bound");
