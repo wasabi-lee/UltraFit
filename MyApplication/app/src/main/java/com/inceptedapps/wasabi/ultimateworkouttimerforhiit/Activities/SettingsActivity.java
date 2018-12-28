@@ -2,6 +2,7 @@ package com.inceptedapps.wasabi.ultimateworkouttimerforhiit.Activities;
 
 import android.content.Intent;
 import android.graphics.Color;
+import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
@@ -14,7 +15,6 @@ import com.inceptedapps.wasabi.ultimateworkouttimerforhiit.PrivateClasses.ThemeU
 import com.inceptedapps.wasabi.ultimateworkouttimerforhiit.R;
 
 public class SettingsActivity extends AppCompatActivity implements SettingsFragment.OnThemeChangedListener {
-
 
     Toolbar mSettingToolbar;
 
