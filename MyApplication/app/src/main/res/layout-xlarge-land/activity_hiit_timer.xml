@@ -46,39 +46,15 @@
                     android:gravity="center"
                     android:orientation="vertical">
 
-                    <LinearLayout
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="right"
-                        android:gravity="right">
-
                         <TextView
                             android:id="@+id/hiit_timer_mins_textView"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_gravity="center"
+                            android:layout_gravity="center_vertical|end"
                             android:fontFamily="sans-serif-thin"
                             android:text="@string/hiit_timer_seconds"
                             android:textColor="?attr/colorPrimary"
                             android:textSize="40sp" />
-
-                        <TextView
-                            android:id="@+id/hiit_timer_mins_text_textView"
-                            android:layout_width="wrap_content"
-                            android:layout_height="match_parent"
-                            android:layout_gravity="center"
-                            android:fontFamily="sans-serif-thin"
-                            android:gravity="bottom"
-                            android:text="@string/hiit_timer_second_text"
-                            android:textColor="?attr/colorPrimary"
-                            android:textSize="30sp" />
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="-20dp"
-                        android:gravity="center_horizontal">
 
                         <TextView
                             android:id="@+id/hiit_timer_seconds_textView"
@@ -90,17 +66,6 @@
                             android:textColor="?attr/colorPrimary"
                             android:textSize="90sp" />
 
-                        <TextView
-                            android:id="@+id/hiit_timer_seconds_text_textView"
-                            android:layout_width="wrap_content"
-                            android:layout_height="match_parent"
-                            android:layout_gravity="center"
-                            android:fontFamily="sans-serif-thin"
-                            android:gravity="bottom"
-                            android:text="@string/hiit_timer_minute_text"
-                            android:textColor="?attr/colorPrimary"
-                            android:textSize="30sp" />
-                    </LinearLayout>
                 </LinearLayout>
 
                 <ProgressBar

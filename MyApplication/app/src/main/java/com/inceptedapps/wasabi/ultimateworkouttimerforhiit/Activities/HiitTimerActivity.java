@@ -88,7 +88,7 @@ public class HiitTimerActivity extends AppCompatActivity implements View.OnClick
     private int songPosition;
     private long mBeepDuration = 1000;
 
-    TextView mTimerMinsTextView, mTimerSecsTextView, mTotalTextView, mWorkoutTextView, mRepsTextView, mMinTextView, mSecTextView, mNoMusicText;
+    TextView mTimerMinsTextView, mTimerSecsTextView, mTotalTextView, mWorkoutTextView, mRepsTextView, mNoMusicText;
     float workoutTvSize;
     ProgressBar mProgressBar;
     HiitTimerSet hiitTimerSet;
@@ -373,8 +373,6 @@ public class HiitTimerActivity extends AppCompatActivity implements View.OnClick
     }
 
     public void initiateTimerData() {
-        mMinTextView = (TextView) findViewById(R.id.hiit_timer_mins_text_textView);
-        mSecTextView = (TextView) findViewById(R.id.hiit_timer_seconds_text_textView);
         mTimerMinsTextView = (TextView) findViewById(R.id.hiit_timer_mins_textView);
         mTimerSecsTextView = (TextView) findViewById(R.id.hiit_timer_seconds_textView);
         mTotalTextView = (TextView) findViewById(R.id.hiit_timer_total_textView);
