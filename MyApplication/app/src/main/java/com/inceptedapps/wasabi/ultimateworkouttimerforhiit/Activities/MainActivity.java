@@ -15,6 +15,7 @@ import android.widget.TextView;
 
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
+import com.inceptedapps.wasabi.ultimateworkouttimerforhiit.db.RealmHelper;
 import com.inceptedapps.wasabi.ultimateworkouttimerforhiit.hiit.HiitTimerListActivity;
 import com.inceptedapps.wasabi.ultimateworkouttimerforhiit.music.SongSingleton;
 import com.inceptedapps.wasabi.ultimateworkouttimerforhiit.custom.IsPremiumSingleton;
@@ -27,40 +28,49 @@ import com.inceptedapps.wasabi.ultimateworkouttimerforhiit.iab.util.IabHelper;
 import com.inceptedapps.wasabi.ultimateworkouttimerforhiit.iab.util.IabResult;
 import com.inceptedapps.wasabi.ultimateworkouttimerforhiit.iab.util.Inventory;
 import com.inceptedapps.wasabi.ultimateworkouttimerforhiit.iab.util.Purchase;
+import com.inceptedapps.wasabi.ultimateworkouttimerforhiit.util.DateHelper;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
 import io.realm.Realm;
 import io.realm.RealmList;
 import io.realm.RealmResults;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
-    private Button mHiitButton, mPresetLoadButton, mTrackProgressButton;
-    private ImageView mSettingsButton;
-    private TextView mGreetingText;
-    private boolean isAnotherDay, isTheVeryFirstLaunch;
-    private boolean isPremium = false;
 
-    public static final String sharedPrefOpenKey = "OPEN";
-    public static final String sharedPrefFirstKey = "VERY_FIRST_LAUNCH";
-    public static final String sharedPrefSongsKey = "SAVED_SONGS";
-    public static final String sharedPrefShuffleKey = "SHUFFLE_KEY";
-    public static final String sharedPrefPremiumKey = "PREMIUM_KEY";
-    public static final String sharedPrefCompletedWorkoutsNumKey = "COMPLETED_NUM_KEY";
-    public static final String sharedPrefDontShowNumKey = "DONT_SHOW_KEY";
+    @BindView(R.id.main_hitt_timer_button)
+    Button mHiitButton;
+
+    @BindView(R.id.main_load_preset_button)
+    Button mPresetLoadButton;
+
+    @BindView(R.id.main_track_progress_button)
+    Button mTrackProgressButton;
+
+    @BindView(R.id.main_settings_icon)
+    ImageView mSettingsButton;
+
+    @BindView(R.id.main_greeting_text)
+    TextView mGreetingText;
+
+    @BindView(R.id.adView)
+    AdView mAdView;
+
+    private boolean isAnotherDay, isFirstLaunch;
+    private boolean isPremium = false;
 
     private Calendar c;
     private SharedPreferences sharedPref;
-    private AdView mAdView;
 
     IabHelper mHelper;
     static final String PREMIUM_SKU = "com.inceptedapps.ultrafit.pro";
     IabHelper.QueryInventoryFinishedListener mGotInventoryListener;
-    private BroadcastReceiver myPromoReceiver;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,18 +78,24 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         setTheme(ThemeUtils.themeSwitcher());
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        ButterKnife.bind(this);
 
-        PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
-        sharedPref = MainActivity.this.getSharedPreferences(sharedPrefOpenKey, Context.MODE_PRIVATE);
+//        PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
+        sharedPref = MainActivity.this.getSharedPreferences(getString(R.string.shared_pref_open_key), Context.MODE_PRIVATE);
 
+        // in-app billing
+        setupIab();
+
+        // Setting main header text
+        setHeaderText();
+
+        prepareDatabase();
+        initializeData();
+
+    }
+
+    private void setupIab() {
         String base64EncodedPublicKey = getResources().getString(R.string.app_license_key);
-        mAdView = (AdView) findViewById(R.id.adView);
-        myPromoReceiver = new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                mHelper.queryInventoryAsync(mGotInventoryListener);
-            }
-        };
 
         mGotInventoryListener = new IabHelper.QueryInventoryFinishedListener() {
             @Override
@@ -91,7 +107,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
                 if (result.isFailure()) {
                     Log.d(getClass().getSimpleName(), "Inventory Failure: " + result.toString());
-                    sharedPref.getBoolean(sharedPrefPremiumKey, false);
+                    sharedPref.getBoolean(getString(R.string.shared_pref_premium_key), false);
                     return;
                 }
 
@@ -101,12 +117,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 isPremium = (premiumPurchase != null);
                 IsPremiumSingleton.getInstance().setPremium(isPremium);
                 Log.d(getClass().getSimpleName(), "This user is " + (isPremium ? "premium" : "basic") + " user");
-                SharedPreferences.Editor editor = sharedPref.edit();
-                editor.putBoolean(sharedPrefPremiumKey, isPremium);
-                editor.commit();
-                Log.d(getClass().getSimpleName(),sharedPref.getBoolean(sharedPrefPremiumKey, false) + "");
 
-                if (!isPremium){
+                SharedPreferences.Editor editor = sharedPref.edit();
+                editor.putBoolean(getString(R.string.shared_pref_premium_key), isPremium);
+                editor.commit();
+                Log.d(getClass().getSimpleName(), sharedPref.getBoolean(getString(R.string.shared_pref_premium_key), false) + "");
+
+                if (!isPremium) {
                     activateAds();
                 } else {
                     if (mAdView != null) {
@@ -123,26 +140,24 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 if (mHelper == null) {
                     return;
                 }
-                if (!result.isSuccess()){
-                    Log.d(getClass().getSimpleName(), "In-app billing setup failed: "+result);
+                if (!result.isSuccess()) {
+                    Log.d(getClass().getSimpleName(), "In-app billing setup failed: " + result);
                     return;
                 }
 
                 Log.d(getClass().getSimpleName(), "In-app billing is set up OK");
                 try {
                     mHelper.queryInventoryAsync(mGotInventoryListener);
-                } catch (Exception e){
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
         });
-        prepareDatabase();
-        initializeData();
-
     }
 
-    private void activateAds(){
-        if (isPremium){
+
+    private void activateAds() {
+        if (isPremium) {
             mAdView.setVisibility(View.GONE);
         } else {
             AdRequest adRequest = new AdRequest.Builder().build();
@@ -150,143 +165,87 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
-    private void retrieveSelectedSongs() {
-        String songIds = sharedPref.getString(sharedPrefSongsKey, "-1");
-        Log.d("SONG_", "retrieveSelectedSongs: MainActivity: "+songIds);
-        if (!songIds.equals("-1")) {
-            SongSingleton.getInstance().setSelectedSongIds(songIds.split("~"));
-            SongSingleton.getInstance().prepSavedSongs(this);
-        } else {
-            SongSingleton.getInstance().getSelectedSongs().clear();
-            SongSingleton.getInstance().setSelectedSongIds(null);
-        }
+
+    private void setHeaderText() {
+        String headerText = DateHelper.getCurrentTimeText(getApplicationContext());
+        mGreetingText.setText(headerText);
     }
 
+
+    private void retrieveSelectedSongs() {
+        String songIds = sharedPref.getString(getString(R.string.shared_pref_songs_key), "-1");
+        SongSingleton.getInstance().setSelectedSongs(getApplicationContext(), songIds);
+    }
+
+
     private void prepareDatabase() {
-        isTheVeryFirstLaunch = sharedPref.getBoolean(sharedPrefFirstKey, true);
-        Log.d("FIRST_LAUNCH", "Is first launch: " + isTheVeryFirstLaunch);
+        String firstLaunchPrefKey = getString(R.string.shared_pref_first_launch_key);
+        isFirstLaunch = sharedPref.getBoolean(firstLaunchPrefKey, true);
         SharedPreferences.Editor editor = sharedPref.edit();
-        Log.d("FIRST_LAUNCH", "is first launch: " + isTheVeryFirstLaunch);
 
         Realm realm = Realm.getDefaultInstance();
         RealmResults<WorkoutLog> results = realm.where(WorkoutLog.class).findAll();
 
-        if (!isTheVeryFirstLaunch && (results.size() != 0)) {
+        if (!isFirstLaunch && (results.size() != 0)) {
+
+            WorkoutLog lastWorkoutLog = results.last();
+
             //Find out if today is another day from the last launch date
-            Date todaysTimeStamp = Calendar.getInstance().getTime();
-            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd", Locale.getDefault());
-            String todaysDate = simpleDateFormat.format(todaysTimeStamp);
+            if (DateHelper.isAnotherDayFromLastWorkout(lastWorkoutLog)) {
 
-            WorkoutLog lastWorkoutLog = realm.where(WorkoutLog.class).findAll().last();
+                //Insert empty rows to the database
+                long timeDifference = todaysTimeStamp.getTime() - lastWorkoutDateTimeStamp.getTime();
+                c = Calendar.getInstance();
+                c.setTime(lastWorkoutDateTimeStamp);
+                c.add(Calendar.DATE, 1);
+                c.add(Calendar.HOUR_OF_DAY, -c.get(Calendar.HOUR_OF_DAY));
+                c.add(Calendar.MINUTE, -c.get(Calendar.MINUTE));
+                c.add(Calendar.SECOND, -c.get(Calendar.SECOND));
+                c.add(Calendar.MILLISECOND, -c.get(Calendar.MILLISECOND));
+                long timeDiffBtwLastTimeAndMidnight = c.getTimeInMillis() - lastWorkoutDateTimeStamp.getTime();
+                long timeUntilNextMidnight = 1000 * 60 * 60 * 24 + timeDiffBtwLastTimeAndMidnight;
 
-            if (lastWorkoutLog != null) {
-                Date lastWorkoutDateTimeStamp = lastWorkoutLog.getmDate();
-                String lastWorkoutDate = simpleDateFormat.format(lastWorkoutDateTimeStamp);
-                simpleDateFormat = null;
-
-                isAnotherDay = !(todaysDate.equals(lastWorkoutDate));
-                Log.d("IS ANOTHER_DAY", isAnotherDay + "");
-
-                if (isAnotherDay) {
-                    //Insert empty rows to the database
-                    long timeDifference = todaysTimeStamp.getTime() - lastWorkoutDateTimeStamp.getTime();
-                    c = Calendar.getInstance();
-                    c.setTime(lastWorkoutDateTimeStamp);
-                    c.add(Calendar.DATE, 1);
-                    c.add(Calendar.HOUR_OF_DAY, -c.get(Calendar.HOUR_OF_DAY));
-                    c.add(Calendar.MINUTE, -c.get(Calendar.MINUTE));
-                    c.add(Calendar.SECOND, -c.get(Calendar.SECOND));
-                    c.add(Calendar.MILLISECOND, -c.get(Calendar.MILLISECOND));
-                    long timeDiffBtwLastTimeAndMidnight = c.getTimeInMillis() - lastWorkoutDateTimeStamp.getTime();
-                    long timeUntilNextMidnight = 1000 * 60 * 60 * 24 + timeDiffBtwLastTimeAndMidnight;
-
-                    if (timeUntilNextMidnight < timeDifference) {
-                        realm.beginTransaction();
-                        long numberOfEmptyRows = (todaysTimeStamp.getTime() - c.getTimeInMillis());
-                        c.setTime(new Date());
-                        c.add(Calendar.DATE, -(int) (numberOfEmptyRows / (1000 * 60 * 60 * 24)) - 1);
-                        while (numberOfEmptyRows > 1000 * 60 * 60 * 24) {
-                            c.add(Calendar.DATE, 1);
-                            WorkoutLog newWorkoutLog = realm.createObject(WorkoutLog.class);
-                            RealmList<TimerLog> newLogList = new RealmList<>();
-                            newLogList.add(new TimerLog(0, "0", "0", 1, 0, 0, "NO WORKOUT FOUND"));
-                            newWorkoutLog.setmDate(c.getTime());
-                            newWorkoutLog.setTimerLogs(newLogList);
-                            numberOfEmptyRows -= 1000 * 60 * 60 * 24;
-                        }
-                        realm.commitTransaction();
+                if (timeUntilNextMidnight < timeDifference) {
+                    realm.beginTransaction();
+                    long numberOfEmptyRows = (todaysTimeStamp.getTime() - c.getTimeInMillis());
+                    c.setTime(new Date());
+                    c.add(Calendar.DATE, -(int) (numberOfEmptyRows / (1000 * 60 * 60 * 24)) - 1);
+                    while (numberOfEmptyRows > 1000 * 60 * 60 * 24) {
+                        c.add(Calendar.DATE, 1);
+                        WorkoutLog newWorkoutLog = realm.createObject(WorkoutLog.class);
+                        RealmList<TimerLog> newLogList = new RealmList<>();
+                        newLogList.add(new TimerLog(0, "0", "0", 1, 0, 0, "NO WORKOUT FOUND"));
+                        newWorkoutLog.setmDate(c.getTime());
+                        newWorkoutLog.setTimerLogs(newLogList);
+                        numberOfEmptyRows -= 1000 * 60 * 60 * 24;
                     }
+                    realm.commitTransaction();
                 }
-                printUpdatedDatabase(realm);
             }
+
+            RealmHelper.printUpdatedDatabase(realm);
+
         } else {
-            results = null;
-            editor.putBoolean(sharedPrefFirstKey, false);
+            editor.putBoolean(firstLaunchPrefKey, false);
             editor.apply();
-            isTheVeryFirstLaunch = sharedPref.getBoolean(sharedPrefFirstKey, true);
-            Log.d("FIRST_LAUNCH", "Is first launch: " + isTheVeryFirstLaunch);
+            isFirstLaunch = false;
         }
-    }
-
-    private void printUpdatedDatabase(Realm realm) {
-        SimpleDateFormat simpleDateformat = new SimpleDateFormat("MMM dd, yyyy, EEE", Locale.getDefault());
-        RealmResults<WorkoutLog> updatedLogs = realm.where(WorkoutLog.class).findAll();
-        Log.d("CURRENT_DATABASE", updatedLogs.size() + "");
-        for (int i = 0; i < updatedLogs.size(); i++) {
-            Log.d("CURRENT_DATABASE", "DATE: " + simpleDateformat.format(updatedLogs.get(i).getmDate()));
-            RealmList<TimerLog> updatedTimerLogs = updatedLogs.get(i).getTimerLogs();
-            for (int j = 0; j < updatedTimerLogs.size(); j++) {
-                Log.d("CURRENT_DATABASE", ", WARMUP: "
-                        + updatedTimerLogs.get(j).getWarmup() + ", WORK: "
-                        + updatedTimerLogs.get(j).getTotalWorkOrRestSeconds(updatedTimerLogs.get(j).getWorkSecs()) + ", RESTS: "
-                        + updatedTimerLogs.get(j).getTotalWorkOrRestSeconds(updatedTimerLogs.get(j).getRestSecs()) + ", REPS: "
-                        + updatedTimerLogs.get(j).getReps() + ", COOL DOWN: "
-                        + updatedTimerLogs.get(j).getCooldown() + ", TOTAL: "
-                        + updatedTimerLogs.get(j).getTotal() + ", WORKOUT NAMES: "
-                        + updatedTimerLogs.get(j).getWorkoutNames());
-            }
-
-        }
-        updatedLogs = null;
-        simpleDateformat = null;
         realm.close();
-
     }
+
 
     private void initializeData() {
-        mHiitButton = (Button) findViewById(R.id.main_hitt_timer_button);
-        mPresetLoadButton = (Button) findViewById(R.id.main_load_preset_button);
-        mTrackProgressButton = (Button) findViewById(R.id.main_track_progress_button);
-        mSettingsButton = (ImageView) findViewById(R.id.main_settings_icon);
-
         SharedPreferences defaultPref = PreferenceManager.getDefaultSharedPreferences(this);
         int theme = Integer.parseInt(defaultPref.getString(getResources().getString(R.string.SHARED_PREF_COLOR_THEME_KEY), "1"));
-        if (theme == 3 || theme == 5){
+        if (theme == 3 || theme == 5) {
             mSettingsButton.setImageResource(R.drawable.ic_settings);
         }
-        mSettingsButton.setOnClickListener(this);
 
+        mSettingsButton.setOnClickListener(this);
         mHiitButton.setOnClickListener(this);
         mPresetLoadButton.setOnClickListener(this);
         mTrackProgressButton.setOnClickListener(this);
 
-        mGreetingText = (TextView) findViewById(R.id.main_greeting_text);
-
-        Calendar c = Calendar.getInstance();
-        int time = c.get(Calendar.HOUR_OF_DAY);
-        if (time <= 10 & time >= 6) {
-            mGreetingText.setText(getResources().getString(R.string.greeting_morning));
-        } else if (time <= 13) {
-            mGreetingText.setText(getResources().getString(R.string.greeting_before_noon));
-        } else if (time <= 18) {
-            mGreetingText.setText(getResources().getString(R.string.greeting_afternoon));
-        } else if (time <= 20) {
-            mGreetingText.setText(getResources().getString(R.string.greeting_evening));
-        } else if (time <= 24) {
-            mGreetingText.setText(getResources().getString(R.string.greeting_midnight));
-        } else if (time > 0 && time < 6) {
-            mGreetingText.setText(getResources().getString(R.string.greeting_dawn));
-        }
     }
 
     @Override
@@ -317,7 +276,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     protected void onResume() {
         super.onResume();
         retrieveSelectedSongs();
-        if (sharedPref.getBoolean(sharedPrefPremiumKey, false) && mAdView != null){
+        if (sharedPref.getBoolean(getString(R.string.shared_pref_premium_key), false) && mAdView != null) {
             mAdView.setVisibility(View.GONE);
         }
     }
@@ -330,7 +289,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (resultCode == RESULT_OK){
+        if (resultCode == RESULT_OK) {
             recreate();
         }
     }

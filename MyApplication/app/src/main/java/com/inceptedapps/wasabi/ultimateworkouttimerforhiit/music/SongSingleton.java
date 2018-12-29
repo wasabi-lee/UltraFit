@@ -32,6 +32,19 @@ public class SongSingleton {
         return instance;
     }
 
+    public void setSelectedSongs(Context context, String songIds) {
+        if (songIds.equals("-1")) {
+            // No songs are selected
+            selectedSongs.clear();
+            selectedSongIds = null;
+        } else {
+            // Parse selected songs
+            selectedSongIds = songIds.split("~");
+            prepSavedSongs(context);
+
+        }
+    }
+
     public String[] getSelectedSongIds() {
         return selectedSongIds;
     }
