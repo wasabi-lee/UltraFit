@@ -2,7 +2,6 @@ package com.inceptedapps.wasabi.ultimateworkouttimerforhiit.activities;
 
 import android.Manifest;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -13,7 +12,6 @@ import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.CardView;
@@ -29,6 +27,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.inceptedapps.wasabi.ultimateworkouttimerforhiit.GoPremiumActivity;
+import com.inceptedapps.wasabi.ultimateworkouttimerforhiit.fragments.BuyPresetPremiumDialog;
+import com.inceptedapps.wasabi.ultimateworkouttimerforhiit.fragments.ExternalStoragePermissionDialog;
 import com.inceptedapps.wasabi.ultimateworkouttimerforhiit.fragments.PresetSaveDialogFragment;
 import com.inceptedapps.wasabi.ultimateworkouttimerforhiit.hiit.HiitSingleton;
 import com.inceptedapps.wasabi.ultimateworkouttimerforhiit.hiit.HiitTimerSet;
@@ -36,7 +36,6 @@ import com.inceptedapps.wasabi.ultimateworkouttimerforhiit.music.SongSingleton;
 import com.inceptedapps.wasabi.ultimateworkouttimerforhiit.custom.ThemeUtils;
 import com.inceptedapps.wasabi.ultimateworkouttimerforhiit.custom.TimerUtils;
 import com.inceptedapps.wasabi.ultimateworkouttimerforhiit.R;
-import com.inceptedapps.wasabi.ultimateworkouttimerforhiit.util.DateHelper;
 import com.inceptedapps.wasabi.ultimateworkouttimerforhiit.util.RoundHelper;
 
 import java.util.concurrent.TimeUnit;
@@ -54,6 +53,8 @@ public class HiitSettingActivity extends AppCompatActivity implements View.OnCli
     public static final String REPS_RESULT_EXTRA_KEY = "REPS_KEY";
 
     private static final String PRESET_SAVE_DIALOG_TAG = "preset_dialog";
+    private static final String BUY_PRESET_PREMIUM_DIALOG_TAG = "buy_preset_premium_dialog";
+    private static final String EXTERNAL_STROAGE_PERMISSION_DIALOG_TAG = "external_storage_permission_dialog";
 
     @BindView(R.id.hitt_timer_setting_warmup_edit)
     EditText editWarmup;
@@ -102,9 +103,8 @@ public class HiitSettingActivity extends AppCompatActivity implements View.OnCli
     @BindView(R.id.hiit_timer_setting_parent_relativelayout)
     RelativeLayout parentLayout;
 
-    private boolean isCanceled = false, isAdvancedSettingSet = false;
+    private boolean isAdvancedSettingSet = false;
     private String customWorkoutNames, customWorkSecs, customRestSecs;
-    private String finalWorkoutNames, finalWorkSecs, finalRestSecs;
     private int totalSecs;
     private int customReps;
     private int theme;
@@ -112,6 +112,7 @@ public class HiitSettingActivity extends AppCompatActivity implements View.OnCli
     private Realm timerRealm;
     private boolean isPremium;
 
+    private HiitTimerSet currentPrset = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -180,15 +181,11 @@ public class HiitSettingActivity extends AppCompatActivity implements View.OnCli
         try {
             HiitTimerSet timerSet = getFinalizedSet();
 
-            if (timerSet.getReps() == 0) {
-                makeToast("The workout should have at least 1 rep!");
-            } else if (timerSet.getTotal() == 0) {
-                makeToast("This set's total time is 0 second!");
-            } else {
-                HiitSingleton.getInstance().addTimer(getFinalizedSet());
-                Intent intent = new Intent(HiitSettingActivity.this, HiitTimerActivity.class);
-                startActivityForResult(intent, 2);
-            }
+            if (checkInput(timerSet)) throw new NumberFormatException("Number format error");
+
+            HiitSingleton.getInstance().addTimer(getFinalizedSet());
+            Intent intent = new Intent(HiitSettingActivity.this, HiitTimerActivity.class);
+            startActivityForResult(intent, 2);
 
         } catch (NullPointerException | NumberFormatException e) {
             makeToast("Please type valid input");
@@ -200,18 +197,21 @@ public class HiitSettingActivity extends AppCompatActivity implements View.OnCli
         return getFinalizedSet(RoundHelper.DEFAULT_TIMER_NAME);
     }
 
-    private HiitTimerSet getFinalizedSet(String timerName) {
-        trimAllEditText();
-        int warmupTime = TimerUtils.stringTimeToSeconds(editWarmup.getText().toString());
-        int defaultWorkTime = TimerUtils.stringTimeToSeconds(editWork.getText().toString());
-        int defaultRestTime = TimerUtils.stringTimeToSeconds(editRest.getText().toString());
-        int defaultReps = Integer.parseInt(editReps.getText().toString());
-        int cooldownTime = TimerUtils.stringTimeToSeconds(editCooldown.getText().toString());
 
-        return RoundHelper.getFinalizedHiitTimerSet(
-                warmupTime, defaultWorkTime, defaultRestTime, defaultReps, cooldownTime,
-                customWorkSecs, customRestSecs, customWorkoutNames, customReps,
-                isAdvancedSettingSet, timerName);
+    private HiitTimerSet getFinalizedSet(String timerName) {
+        if (trimAllEditText()) {
+            int warmupTime = TimerUtils.stringTimeToSeconds(editWarmup.getText().toString());
+            int defaultWorkTime = TimerUtils.stringTimeToSeconds(editWork.getText().toString());
+            int defaultRestTime = TimerUtils.stringTimeToSeconds(editRest.getText().toString());
+            int defaultReps = Integer.parseInt(editReps.getText().toString());
+            int cooldownTime = TimerUtils.stringTimeToSeconds(editCooldown.getText().toString());
+
+            return RoundHelper.getFinalizedHiitTimerSet(
+                    warmupTime, defaultWorkTime, defaultRestTime, defaultReps, cooldownTime,
+                    customWorkSecs, customRestSecs, customWorkoutNames, customReps,
+                    isAdvancedSettingSet, timerName);
+        }
+        return null;
     }
 
 
@@ -264,40 +264,10 @@ public class HiitSettingActivity extends AppCompatActivity implements View.OnCli
                 controlArrowAction(editCooldown, 1);
                 break;
             case R.id.hiit_timer_setting_advanced_edit_image_view:
-                Intent advancedSettingIntent = new Intent(HiitSettingActivity.this, AdvancedSettingActivity.class);
-                int currentReps = Integer.parseInt(editReps.getText().toString());
-                if (currentReps < 1) {
-                    editReps.setText("1");
-                }
-                if (isAdvancedSettingSet) {
-                    if (currentReps != customReps) {
-                        String[] currentDetails = finalizeWorkoutDetails(currentReps,
-                                TimerUtils.stringTimeToSeconds(editWork.getText().toString()),
-                                TimerUtils.stringTimeToSeconds(editRest.getText().toString()),
-                                customWorkoutNames, customWorkSecs, customRestSecs);
-                        customWorkoutNames = currentDetails[0];
-                        customWorkSecs = currentDetails[1];
-                        customRestSecs = currentDetails[2];
-                        currentDetails = null;
-                    }
-                    advancedSettingIntent.putExtra(AdvancedSettingActivity.WORKOUT_NAME_DETAILS_KEY, customWorkoutNames);
-                    advancedSettingIntent.putExtra(AdvancedSettingActivity.WORK_SECS_DETAILS_KEY, customWorkSecs);
-                    advancedSettingIntent.putExtra(AdvancedSettingActivity.REST_SECS_DETAILS_KEY, customRestSecs);
-                } else {
-                    advancedSettingIntent.putExtra(AdvancedSettingActivity.WORKOUT_REPS_EXTRA_KEY, Integer.parseInt(editReps.getText().toString()));
-                    advancedSettingIntent.putExtra(AdvancedSettingActivity.WORKOUT_WORK_TIME_EXTRA_KEY, TimerUtils.stringTimeToSeconds(editWork.getText().toString()));
-                    advancedSettingIntent.putExtra(AdvancedSettingActivity.WORKOUT_REST_TIME_EXTRA_KEY, TimerUtils.stringTimeToSeconds(editRest.getText().toString()));
-                }
-                startActivityForResult(advancedSettingIntent, AdvancedSettingActivity.REQUEST_CODE_FROM_SETTING_ACTIVITY);
+                startAdvancedSettingActivity();
                 break;
             case R.id.hiit_timer_setting_music_card:
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M
-                        && ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-                    launchPermissionRequiredDialog();
-                } else {
-                    Intent intent = new Intent(HiitSettingActivity.this, CurrentMusicListActivity.class);
-                    startActivity(intent);
-                }
+                startMusicSelectionActivity();
                 break;
             default:
                 break;
@@ -308,55 +278,69 @@ public class HiitSettingActivity extends AppCompatActivity implements View.OnCli
     public void onFocusChange(View v, boolean hasFocus) {
         try {
             EditText currentEditText = (EditText) v;
-            if (currentEditText.getId() == R.id.hitt_timer_setting_reps_edit) {
-                String currentReps = currentEditText.getText().toString();
-                if (Integer.parseInt(currentReps) < 1) {
-                    currentEditText.setText("1");
-                }
-            } else {
-                String userInput = currentEditText.getText().toString();
-                currentEditText.setText(TimerUtils.convertRawSecIntoString(TimerUtils.stringTimeToSeconds(userInput)));
-            }
+            if (currentEditText.getId() == R.id.hitt_timer_setting_reps_edit)
+                checkRepCount(currentEditText);
+             else
+                trimEditText(currentEditText);
             totalTextView.setText(calculateTotalTime());
         } catch (Exception e) {
             e.printStackTrace();
-            Toast.makeText(HiitSettingActivity.this, "Please enter valid numbers", Toast.LENGTH_SHORT).show();
+            makeToast("Please enter valid numbers");
             ((EditText) v).setText(getResources().getString(R.string.advanced_default_seconds));
         }
     }
 
-    private void launchPermissionRequiredDialog() {
-        AlertDialog.Builder permissionDescription = new AlertDialog.Builder(this);
-        permissionDescription.setTitle("User permission");
-        permissionDescription.setMessage("UltraFit Interval Timer needs to access your media files to play music during the workout. " +
-                "This permission will allow this app to do that. " +
-                "If you click No, we won't access your music files but you won't be able to enjoy music playback. \n\n" +
-                "(If you have denied previously and checked 'do not ask again', you should clear the app data and reinstall the app. " +
-                "Please be aware that this will clear your workout data and stored presets.)");
-        permissionDescription.setPositiveButton("YES", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                askStoragePermission();
-                dialog.dismiss();
-            }
-        });
-        permissionDescription.setNegativeButton("NO", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.dismiss();
-            }
-        });
-        permissionDescription.create().show();
+
+    private void checkRepCount(EditText editText) {
+        String currentReps = editText.getText().toString();
+        if (Integer.parseInt(currentReps) < 1) {
+            editText.setText("1");
+        }
     }
 
-    private void askStoragePermission() {
-        if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.READ_EXTERNAL_STORAGE)) {
+
+    private void trimEditText(EditText editText) {
+        String userInput = editText.getText().toString();
+        editText.setText(TimerUtils.convertUserInputToValidString(userInput));
+    }
+
+
+    private void startMusicSelectionActivity() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M
+                && ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            launchPermissionRequiredDialog();
+        } else {
+            Intent intent = new Intent(HiitSettingActivity.this, CurrentMusicListActivity.class);
+            startActivity(intent);
         }
+    }
+
+
+    private void startAdvancedSettingActivity() {
+        Intent advanceIntent = new Intent(HiitSettingActivity.this, AdvancedSettingActivity.class);
+        HiitTimerSet set = getFinalizedSet();
+
+        if (!checkInput(set)) return;
+
+        advanceIntent.putExtra(AdvancedSettingActivity.WORKOUT_NAME_DETAILS_KEY, set.getWorkoutNames());
+        advanceIntent.putExtra(AdvancedSettingActivity.WORK_SECS_DETAILS_KEY, set.getWorkSeconds());
+        advanceIntent.putExtra(AdvancedSettingActivity.REST_SECS_DETAILS_KEY, set.getRestSeconds());
+        startActivityForResult(advanceIntent, AdvancedSettingActivity.REQUEST_CODE_FROM_SETTING_ACTIVITY);
+    }
+
+
+    private void launchPermissionRequiredDialog() {
+        ExternalStoragePermissionDialog dialog = new ExternalStoragePermissionDialog();
+        dialog.show(getSupportFragmentManager(), EXTERNAL_STROAGE_PERMISSION_DIALOG_TAG);
+    }
+
+
+    public void askStoragePermission() {
         ActivityCompat.requestPermissions(this,
                 new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
                 1001);
-
     }
+
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
@@ -369,91 +353,59 @@ public class HiitSettingActivity extends AppCompatActivity implements View.OnCli
         }
     }
 
-    private String[] finalizeWorkoutDetails(int repsTime, int workTime, int restTime, String workoutNames, String workSecs, String restSecs) {
-        if (repsTime > customReps) {
-            for (int i = 0; i < repsTime - customReps; i++) {
-                workoutNames += "=Sprint";
-                workSecs += ("=" + workTime);
-                restSecs += ("=" + restTime);
-            }
-        }
-        if (repsTime < customReps) {
-            for (int i = 0; i < customReps - repsTime; i++) {
-                workoutNames = workoutNames.substring(0, workoutNames.lastIndexOf("="));
-                workSecs = workSecs.substring(0, workSecs.lastIndexOf("="));
-                restSecs = restSecs.substring(0, restSecs.lastIndexOf("="));
-            }
-        }
-        String[] splitedWorkSecs = workSecs.split("=");
-        String[] splitedRestSecs = restSecs.split("=");
-        int totalWorkRestSecs = 0;
-        for (int i = 0; i < splitedWorkSecs.length; i++) {
-            totalWorkRestSecs += (Integer.parseInt(splitedWorkSecs[i]) + Integer.parseInt(splitedRestSecs[i]));
-        }
-        return new String[]{workoutNames, workSecs, restSecs, String.valueOf(totalWorkRestSecs)};
-    }
 
-    public void saveThisPreset() {
-        try {
-            trimAllEditText();
-        } catch (NumberFormatException e) {
-            makeToast("Please type valid input");
-        }
-
-        if (Integer.parseInt(editReps.getText().toString()) == 0) {
-            makeToast("Please type at least 1 rep!");
-        } else if (TimerUtils.stringTimeToSeconds(calculateTotalTime()) == 0) {
-            makeToast("This set's total time is 0 second!");
-        } else {
+    public void startPresetSaveFlow() {
+        currentPrset = getFinalizedSet();
+        if (checkInput(currentPrset)) {
             if (isPremium || timerRealm.where(HiitTimerSet.class).findAll().size() < 3) {
-                if (theme == 3 || theme == 5) {
-                    launchTimersetNameSettingDialog(16974377);
-                } else {
-                    launchTimersetNameSettingDialog(16974397);
-                }
+                launchTimersetNameSettingDialog();
             } else {
-                if (theme == 3 || theme == 5) {
-                    launchBuyPremiumDialog(16974377);
-                } else {
-                    launchBuyPremiumDialog(16974397);
-                }
+                launchBuyPremiumDialog();
             }
         }
     }
 
-    private void launchBuyPremiumDialog(int theme) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(HiitSettingActivity.this, theme);
-        builder.setTitle(getResources().getString(R.string.hiit_setting_buy_premium_dialog_title));
-        builder.setMessage(getResources().getString(R.string.hiit_setting_buy_premium_dialog_message));
-        builder.setPositiveButton(getResources().getString(R.string.hiit_setting_buy_premium_dialog_positive_button), new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                Intent intent = new Intent(HiitSettingActivity.this, GoPremiumActivity.class);
-                startActivity(intent);
-            }
-        });
-        builder.setNegativeButton(getResources().getString(R.string.hiit_setting_buy_premium_dialog_negative_button), new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.dismiss();
-            }
-        });
-        builder.create().show();
+
+    private boolean checkInput(HiitTimerSet set) {
+        if (set.getReps() == 0) {
+            makeToast("Please type at least 1 rep!");
+            return false;
+        } else if (set.getTotal() == 0) {
+            makeToast("This set's total time is 0 second!");
+            return false;
+        }
+        return true;
     }
 
-    private void launchTimersetNameSettingDialog(int theme) {
+
+    private void launchBuyPremiumDialog() {
+        BuyPresetPremiumDialog dialog = new BuyPresetPremiumDialog();
+        dialog.show(getSupportFragmentManager(), BUY_PRESET_PREMIUM_DIALOG_TAG);
+    }
+
+
+    public void startGoPremiumActivity() {
+        Intent intent = new Intent(HiitSettingActivity.this, GoPremiumActivity.class);
+        startActivity(intent);
+    }
+
+
+    private void launchTimersetNameSettingDialog() {
         PresetSaveDialogFragment dialog = new PresetSaveDialogFragment();
         dialog.show(getSupportFragmentManager(), PRESET_SAVE_DIALOG_TAG);
     }
 
 
     public void savePreset(String timerName) {
+        if (currentPrset == null) {
+            makeToast("Unexpected error occurred. Please try again later!");
+        }
+        currentPrset.setTimerName(timerName);
         timerRealm.beginTransaction();
-        timerRealm.copyToRealm(getFinalizedSet(timerName));
+        timerRealm.copyToRealm(currentPrset);
         timerRealm.commitTransaction();
         Snackbar.make(parentLayout, "Saved this preset", Snackbar.LENGTH_LONG).show();
     }
-
 
 
     private void controlArrowAction(View view, int flag) {
@@ -503,11 +455,18 @@ public class HiitSettingActivity extends AppCompatActivity implements View.OnCli
         currentEditText = null;
     }
 
-    private void trimAllEditText() {
-        editWarmup.setText(trimTimeString(editWarmup.getText().toString().split(":")));
-        editWork.setText(trimTimeString(editWork.getText().toString().split(":")));
-        editRest.setText(trimTimeString(editRest.getText().toString().split(":")));
-        editCooldown.setText(trimTimeString(editCooldown.getText().toString().split(":")));
+    private boolean trimAllEditText() {
+        try {
+            editWarmup.setText(trimTimeString(editWarmup.getText().toString().split(":")));
+            editWork.setText(trimTimeString(editWork.getText().toString().split(":")));
+            editRest.setText(trimTimeString(editRest.getText().toString().split(":")));
+            editCooldown.setText(trimTimeString(editCooldown.getText().toString().split(":")));
+        } catch (NumberFormatException e) {
+            e.printStackTrace();
+            makeToast("Please type valid input");
+            return false;
+        }
+        return true;
     }
 
     private String trimTimeString(String[] minAndSec) {
@@ -561,12 +520,9 @@ public class HiitSettingActivity extends AppCompatActivity implements View.OnCli
             totalSecs = data.getIntExtra(TOTAL_WORKOUT_TIME_RESULT_EXTRA_KEY, 0);
             customReps = data.getIntExtra(REPS_RESULT_EXTRA_KEY, Integer.parseInt(editReps.getText().toString()));
 
-            int rawTotal = TimerUtils.stringTimeToSeconds(editWarmup.getText().toString()) + totalSecs + TimerUtils.stringTimeToSeconds(editCooldown.getText().toString());
-            totalTextView.setText(TimerUtils.convertRawSecIntoString(rawTotal));
+            totalTextView.setText(calculateTotalTime());
             editReps.setText(String.valueOf(customReps));
-
         }
-        super.onActivityResult(requestCode, resultCode, data);
     }
 
     @Override
@@ -589,6 +545,7 @@ public class HiitSettingActivity extends AppCompatActivity implements View.OnCli
         return super.onCreateOptionsMenu(menu);
     }
 
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
@@ -596,12 +553,13 @@ public class HiitSettingActivity extends AppCompatActivity implements View.OnCli
                 onBackPressed();
                 break;
             case R.id.hiit_timer_setting_save_preset:
-                saveThisPreset();
+                startPresetSaveFlow();
             default:
                 break;
         }
         return super.onOptionsItemSelected(item);
     }
+
 
     @Override
     protected void onDestroy() {

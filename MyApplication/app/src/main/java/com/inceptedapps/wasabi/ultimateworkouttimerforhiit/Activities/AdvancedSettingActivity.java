@@ -30,10 +30,6 @@ import java.util.ArrayList;
 
 public class AdvancedSettingActivity extends AppCompatActivity implements View.OnClickListener, View.OnFocusChangeListener {
 
-    public static final String WORKOUT_REPS_EXTRA_KEY = "WORKOUT_REPS";
-    public static final String WORKOUT_WORK_TIME_EXTRA_KEY = "WORKOUT_SECS";
-    public static final String WORKOUT_REST_TIME_EXTRA_KEY = "REST_SECS";
-
     public static final String WORKOUT_NAME_DETAILS_KEY = "WORKOUT_NAME_DETAILS_KEY";
     public static final String WORK_SECS_DETAILS_KEY = "WORK_SECS_DETAILS_KEY";
     public static final String REST_SECS_DETAILS_KEY = "REST_SECS_DETAILS_KEY";
@@ -91,18 +87,7 @@ public class AdvancedSettingActivity extends AppCompatActivity implements View.O
 
         linearLayout = (LinearLayout) findViewById(R.id.advanced_setting_parent_linear);
 
-        if (getIntent().hasExtra(WORKOUT_REPS_EXTRA_KEY)) {
-            mReps = getIntent().getIntExtra(WORKOUT_REPS_EXTRA_KEY, 1);
-            mWork = getIntent().getIntExtra(WORKOUT_WORK_TIME_EXTRA_KEY, 20);
-            mRest = getIntent().getIntExtra(WORKOUT_REST_TIME_EXTRA_KEY, 10);
-            mWorkoutDetails = new ArrayList<>();
-            for (int i = 0; i < mReps; i++) {
-                //TODO Generate workout details objects and add it to the ArrayList
-                WorkoutDetails detail = new WorkoutDetails("Sprint", mWork, mRest);
-                mWorkoutDetails.add(detail);
-                detail = null;
-            }
-        } else if (getIntent().hasExtra(WORKOUT_NAME_DETAILS_KEY)) {
+        if (getIntent().hasExtra(WORKOUT_NAME_DETAILS_KEY)) {
             mWorkoutNames = getIntent().getStringExtra(WORKOUT_NAME_DETAILS_KEY).split("=");
             mWorkSecs = getIntent().getStringExtra(WORK_SECS_DETAILS_KEY).split("=");
             mRestSecs = getIntent().getStringExtra(REST_SECS_DETAILS_KEY).split("=");

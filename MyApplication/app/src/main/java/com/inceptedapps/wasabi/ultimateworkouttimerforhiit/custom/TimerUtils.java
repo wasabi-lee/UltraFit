@@ -9,6 +9,11 @@ public class TimerUtils {
 
     public TimerUtils() {}
 
+
+    public static String convertUserInputToValidString(String userInput) {
+        return convertRawSecIntoString(TimerUtils.stringTimeToSeconds(userInput));
+    }
+
     /***
      *
      * Changes a raw second data (67 seconds) into a four digit string form (01:07.)
