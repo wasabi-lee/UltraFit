@@ -154,8 +154,8 @@ public class HiitTimerActivity extends AppCompatActivity implements View.OnClick
 
 
         Log.d(TAG, "onCreate: ");
-        sharedPref = getSharedPreferences(MainActivity.sharedPrefOpenKey, Context.MODE_PRIVATE);
-        isPremium = this.getSharedPreferences(MainActivity.sharedPrefOpenKey, Context.MODE_PRIVATE).getBoolean(MainActivity.sharedPrefPremiumKey, false);
+        sharedPref = getSharedPreferences(getString(R.string.shared_pref_open_key), Context.MODE_PRIVATE);
+        isPremium = sharedPref.getBoolean(getString(R.string.shared_pref_premium_key), false);
         Log.d(getClass().getSimpleName(), "Is Premium: " + isPremium);
 
 
@@ -296,7 +296,7 @@ public class HiitTimerActivity extends AppCompatActivity implements View.OnClick
         mSkipNextIcon = (ImageView) findViewById(R.id.drawer_skip_next_icon);
         mSkipPrevIcon = (ImageView) findViewById(R.id.drawer_skip_prev_icon);
         mShuffleIcon = (ImageView) findViewById(R.id.drawer_shuffle_icon);
-        if (sharedPref.getBoolean(MainActivity.sharedPrefShuffleKey, false)) {
+        if (sharedPref.getBoolean(getString(R.string.shared_pref_shuffle_key), false)) {
             mShuffleIcon.setImageResource(R.drawable.ic_action_playback_schuffle);
         } else {
             mShuffleIcon.setImageResource(R.drawable.ic_action_playback_repeat);
@@ -700,11 +700,10 @@ public class HiitTimerActivity extends AppCompatActivity implements View.OnClick
     }
 
     private void saveShuffleIntoSharedPref(boolean isShuffleOn) {
-        sharedPref = getSharedPreferences(MainActivity.sharedPrefOpenKey, Context.MODE_PRIVATE);
+        sharedPref = getSharedPreferences(getString(R.string.shared_pref_open_key), Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPref.edit();
-        editor.remove(MainActivity.sharedPrefShuffleKey);
-        editor.putBoolean(MainActivity.sharedPrefShuffleKey, isShuffleOn);
-        Log.d(getClass().getSimpleName(), sharedPref.getBoolean(MainActivity.sharedPrefShuffleKey, false) + "");
+        editor.putBoolean(getString(R.string.shared_pref_shuffle_key), isShuffleOn);
+//        Log.d(getClass().getSimpleName(), sharedPref.getBoolean(MainActivity.sharedPrefShuffleKey, false) + "");
         editor.apply();
     }
 

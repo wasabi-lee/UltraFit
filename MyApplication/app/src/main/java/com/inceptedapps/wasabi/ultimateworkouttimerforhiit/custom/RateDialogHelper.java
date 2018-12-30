@@ -46,13 +46,14 @@ public class RateDialogHelper {
     }
 
     public void checkIfShouldLaunchDialog() {
-        SharedPreferences prefs = context.getSharedPreferences(MainActivity.sharedPrefOpenKey, Context.MODE_PRIVATE);
-        if (prefs.getBoolean(MainActivity.sharedPrefDontShowNumKey, false)) {
+        SharedPreferences prefs = context.getSharedPreferences(context.getString(R.string.shared_pref_open_key),
+                Context.MODE_PRIVATE);
+        if (prefs.getBoolean(context.getString(R.string.shared_pref_dont_show_num_key), false)) {
             return;
         }
         SharedPreferences.Editor editor = prefs.edit();
-        int launch_count = prefs.getInt(MainActivity.sharedPrefCompletedWorkoutsNumKey, 0) + 1;
-        editor.putInt(MainActivity.sharedPrefCompletedWorkoutsNumKey, launch_count);
+        int launch_count = prefs.getInt(context.getString(R.string.shared_pref_completed_workouts_num_key), 0) + 1;
+        editor.putInt(context.getString(R.string.shared_pref_completed_workouts_num_key), launch_count);
         editor.apply();
 
         if (launch_count % COMPLETED_WORKOUTS_UNTIL_PROMPT == 0) {
@@ -175,9 +176,9 @@ public class RateDialogHelper {
     }
 
     private void writeDontShowAgain() {
-        SharedPreferences pref = context.getSharedPreferences(MainActivity.sharedPrefOpenKey, Context.MODE_PRIVATE);
+        SharedPreferences pref = context.getSharedPreferences(context.getString(R.string.shared_pref_open_key), Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = pref.edit();
-        editor.putBoolean(MainActivity.sharedPrefDontShowNumKey, true);
+        editor.putBoolean(context.getString(R.string.shared_pref_dont_show_num_key), true);
         editor.apply();
     }
 

@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:id="@+id/advanced_setting_parent_linear"
-    tools:context=".Activities.AdvancedSettingActivity">
+    tools:context=".activities.AdvancedSettingActivity">
 
     <android.support.v7.widget.Toolbar
         android:id="@+id/advanced_setting_toolbar"

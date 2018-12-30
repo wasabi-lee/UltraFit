@@ -3,4 +3,7 @@
     <attr name="circularProgress" format="reference"/>
     <attr name="mainButton" format="reference"/>
     <attr name="roundButton" format="reference"/>
+    <attr name="rightArrowDrawable" format="reference" />
+    <attr name="leftArrowDrawable" format="reference" />
+    <attr name="advancedSettingDrawable" format="reference" />
 </resources>

@@ -33,7 +33,6 @@ public class WorkoutLog extends RealmObject {
     }
 
     public void setTimerLogs(RealmList<TimerLog> timerLogs) {
-        this.timerLogs.clear();
-        this.timerLogs.addAll(timerLogs);
+        this.timerLogs = timerLogs;
     }
 }

@@ -7,14 +7,14 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".Activities.HiitSettingActivity">
+    tools:context=".activities.HiitSettingActivity">
 
     <android.support.v7.widget.Toolbar
+        android:id="@+id/hiit_timer_toolbar"
         android:layout_width="match_parent"
         android:layout_height="?android:attr/actionBarSize"
         android:layout_gravity="top"
         android:background="?attr/colorPrimary"
-        android:id="@+id/hiit_timer_toolbar"
         android:elevation="4dp"
         app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
         app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar" />
@@ -35,6 +35,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="20dp"
+                app:cardBackgroundColor="@android:color/transparent"
                 card_view:cardCornerRadius="0dp"
                 card_view:cardElevation="2dp"
                 card_view:contentPadding="20dp">
@@ -66,7 +67,7 @@
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="0.3"
-                            android:src="@drawable/ic_keyboard_arrow_left" />
+                            android:src="?attr/leftArrowDrawable" />
 
                         <EditText
                             android:id="@+id/hitt_timer_setting_warmup_edit"
@@ -85,7 +86,7 @@
                             android:layout_height="wrap_content"
                             android:layout_weight="0.3"
                             android:maxLength="5"
-                            android:src="@drawable/ic_keyboard_arrow_right" />
+                            android:src="?attr/rightArrowDrawable" />
 
                     </LinearLayout>
                 </LinearLayout>
@@ -96,6 +97,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="20dp"
+                app:cardBackgroundColor="@android:color/transparent"
                 card_view:cardCornerRadius="0dp"
                 card_view:cardElevation="2dp"
                 card_view:contentPadding="20dp">
@@ -113,8 +115,8 @@
                         <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_marginBottom="10dp"
                             android:layout_marginTop="10dp"
+                            android:layout_marginBottom="10dp"
                             android:orientation="vertical">
 
                             <TextView
@@ -137,7 +139,7 @@
                                     android:layout_width="0dp"
                                     android:layout_height="wrap_content"
                                     android:layout_weight="0.3"
-                                    android:src="@drawable/ic_keyboard_arrow_left" />
+                                    android:src="?attr/leftArrowDrawable" />
 
                                 <EditText
                                     android:id="@+id/hitt_timer_setting_work_edit"
@@ -155,7 +157,7 @@
                                     android:layout_width="0dp"
                                     android:layout_height="wrap_content"
                                     android:layout_weight="0.3"
-                                    android:src="@drawable/ic_keyboard_arrow_right" />
+                                    android:src="?attr/rightArrowDrawable" />
 
                             </LinearLayout>
                         </LinearLayout>
@@ -164,8 +166,8 @@
                         <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_marginBottom="10dp"
                             android:layout_marginTop="10dp"
+                            android:layout_marginBottom="10dp"
                             android:orientation="vertical">
 
                             <TextView
@@ -188,7 +190,7 @@
                                     android:layout_width="0dp"
                                     android:layout_height="wrap_content"
                                     android:layout_weight="0.3"
-                                    android:src="@drawable/ic_keyboard_arrow_left" />
+                                    android:src="?attr/leftArrowDrawable" />
 
                                 <EditText
                                     android:id="@+id/hitt_timer_setting_rest_edit"
@@ -206,7 +208,7 @@
                                     android:layout_width="0dp"
                                     android:layout_height="wrap_content"
                                     android:layout_weight="0.3"
-                                    android:src="@drawable/ic_keyboard_arrow_right" />
+                                    android:src="?attr/rightArrowDrawable" />
 
                             </LinearLayout>
                         </LinearLayout>
@@ -215,8 +217,8 @@
                         <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_marginBottom="10dp"
                             android:layout_marginTop="10dp"
+                            android:layout_marginBottom="10dp"
                             android:orientation="vertical">
 
                             <TextView
@@ -239,7 +241,7 @@
                                     android:layout_width="0dp"
                                     android:layout_height="wrap_content"
                                     android:layout_weight="0.3"
-                                    android:src="@drawable/ic_keyboard_arrow_left" />
+                                    android:src="?attr/leftArrowDrawable" />
 
                                 <EditText
                                     android:id="@+id/hitt_timer_setting_reps_edit"
@@ -256,7 +258,7 @@
                                     android:layout_width="0dp"
                                     android:layout_height="wrap_content"
                                     android:layout_weight="0.3"
-                                    android:src="@drawable/ic_keyboard_arrow_right" />
+                                    android:src="?attr/rightArrowDrawable" />
 
                             </LinearLayout>
                         </LinearLayout>
@@ -267,9 +269,9 @@
                         android:id="@+id/hiit_timer_setting_advanced_edit_image_view"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_gravity="right"
+                        android:layout_gravity="end"
                         android:padding="6dp"
-                        android:src="@drawable/ic_create" />
+                        android:src="?attr/advancedSettingDrawable" />
 
                 </FrameLayout>
 
@@ -279,6 +281,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="20dp"
+                app:cardBackgroundColor="@android:color/transparent"
                 card_view:cardCornerRadius="0dp"
                 card_view:cardElevation="2dp"
                 card_view:contentPadding="20dp">
@@ -309,7 +312,7 @@
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="0.3"
-                            android:src="@drawable/ic_keyboard_arrow_left" />
+                            android:src="?attr/leftArrowDrawable" />
 
                         <EditText
                             android:id="@+id/hitt_timer_setting_cooldown_edit"
@@ -319,15 +322,15 @@
                             android:gravity="center"
                             android:inputType="time"
                             android:maxLength="5"
-                            android:textSize="20dp"
-                            android:text="@string/hiit_setting_default_cooldown_second"/>
+                            android:text="@string/hiit_setting_default_cooldown_second"
+                            android:textSize="20dp" />
 
                         <ImageView
                             android:id="@+id/hitt_timer_setting_cooldown_right_arrow"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="0.3"
-                            android:src="@drawable/ic_keyboard_arrow_right" />
+                            android:src="?attr/rightArrowDrawable" />
 
                     </LinearLayout>
 
@@ -341,6 +344,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="20dp"
+                app:cardBackgroundColor="@android:color/transparent"
                 card_view:cardCornerRadius="0dp"
                 card_view:cardElevation="2dp"
                 card_view:contentPadding="20dp">
@@ -368,7 +372,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/hiit_setting_num_of_music"
-                        android:textSize="20sp"/>
+                        android:textSize="20sp" />
 
 
                 </LinearLayout>
@@ -381,6 +385,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="20dp"
+                app:cardBackgroundColor="@android:color/transparent"
                 card_view:cardCornerRadius="0dp"
                 card_view:cardElevation="2dp"
                 card_view:contentPadding="10dp">
@@ -445,16 +450,6 @@
                 android:textStyle="bold" />
         </LinearLayout>
     </ScrollView>
-
-    <!--<TextView-->
-    <!--android:layout_width="match_parent"-->
-    <!--android:layout_height="50dp"-->
-    <!--android:layout_alignParentBottom="true"-->
-    <!--android:layout_gravity="bottom"-->
-    <!--android:background="#e3e3e3"-->
-    <!--android:gravity="center"-->
-    <!--android:text="Ad goes here"-->
-    <!--android:textSize="10sp" />-->
 
 
 </RelativeLayout>

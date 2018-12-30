@@ -4,10 +4,10 @@
     android:id="@+id/card_view"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="?android:attr/selectableItemBackground"
-    android:paddingBottom="16dp"
-    android:paddingTop="16dp"
     android:layout_marginBottom="16dp"
+    android:paddingTop="16dp"
+    android:paddingBottom="16dp"
+    card_view:cardBackgroundColor="@android:color/transparent"
     card_view:cardCornerRadius="2dp"
     card_view:cardElevation="4dp">
 
@@ -27,10 +27,10 @@
                 android:id="@+id/hiit_timer_list_timer_name"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:paddingBottom="8dp"
                 android:paddingLeft="16dp"
-                android:paddingRight="16dp"
                 android:paddingTop="8dp"
+                android:paddingRight="16dp"
+                android:paddingBottom="8dp"
                 android:text="@string/preset_card_preset_name"
                 android:textColor="?attr/colorPrimary"
                 android:textSize="24sp" />
@@ -50,7 +50,7 @@
             android:id="@+id/line_one"
             android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:background="#e3e3e3"/>
+            android:background="#e3e3e3" />
 
 
         <LinearLayout
@@ -63,10 +63,10 @@
                 android:id="@+id/relative_two"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:paddingBottom="8dp"
                 android:paddingLeft="23dp"
+                android:paddingTop="8dp"
                 android:paddingRight="23dp"
-                android:paddingTop="8dp">
+                android:paddingBottom="8dp">
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -97,10 +97,10 @@
                     android:layout_weight="1"
                     android:gravity="center"
                     android:orientation="vertical"
-                    android:paddingBottom="8dp"
                     android:paddingLeft="16dp"
+                    android:paddingTop="8dp"
                     android:paddingRight="16dp"
-                    android:paddingTop="8dp">
+                    android:paddingBottom="8dp">
 
                     <TextView
                         android:id="@+id/hiit_timer_list_work_time"
@@ -130,10 +130,10 @@
                     android:layout_weight="1"
                     android:gravity="center"
                     android:orientation="vertical"
-                    android:paddingBottom="8dp"
                     android:paddingLeft="16dp"
+                    android:paddingTop="8dp"
                     android:paddingRight="16dp"
-                    android:paddingTop="8dp">
+                    android:paddingBottom="8dp">
 
                     <TextView
                         android:id="@+id/hiit_timer_list_rest_time"
@@ -163,10 +163,10 @@
                     android:layout_weight="1"
                     android:gravity="center"
                     android:orientation="vertical"
-                    android:paddingBottom="8dp"
                     android:paddingLeft="16dp"
+                    android:paddingTop="8dp"
                     android:paddingRight="16dp"
-                    android:paddingTop="8dp">
+                    android:paddingBottom="8dp">
 
                     <TextView
                         android:id="@+id/hiit_timer_list_rounds"
@@ -190,10 +190,10 @@
                 android:id="@+id/relative_three"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:paddingBottom="4dp"
                 android:paddingLeft="23dp"
+                android:paddingTop="8dp"
                 android:paddingRight="23dp"
-                android:paddingTop="8dp">
+                android:paddingBottom="4dp">
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -214,10 +214,10 @@
                 android:id="@+id/relative_four"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:paddingBottom="8dp"
                 android:paddingLeft="23dp"
+                android:paddingTop="4dp"
                 android:paddingRight="23dp"
-                android:paddingTop="4dp">
+                android:paddingBottom="8dp">
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -240,7 +240,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
                 android:background="#e3e3e3" />
-
 
 
             <Button

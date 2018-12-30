@@ -54,12 +54,21 @@ public class DateHelper {
 
 
     public static boolean isAnotherDayFromLastWorkout(WorkoutLog lastWorkoutLog) {
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd", Locale.getDefault());
-        Date todaysTimeStamp = Calendar.getInstance().getTime();
+        Date todayDate = Calendar.getInstance().getTime();
         Date lastWorkoutTimestamp = lastWorkoutLog.getmDate();
-        String todaysDate = simpleDateFormat.format(todaysTimeStamp);
-        String lastWorkoutDate = simpleDateFormat.format(lastWorkoutTimestamp);
-        return !todaysDate.equals(lastWorkoutDate);
+        return !isSameDate(todayDate, lastWorkoutTimestamp);
     }
+
+    public static boolean isAnotherDayFromLastWorkout(Date lastWorkoutDate) {
+        Date todayDate = Calendar.getInstance().getTime();
+        return !isSameDate(todayDate, lastWorkoutDate);
+    }
+
+
+    public static boolean isSameDate(Date date1, Date date2) {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+        return sdf.format(date1).equals(sdf.format(date2));
+    }
+
 
 }

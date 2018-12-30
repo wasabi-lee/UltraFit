@@ -9,8 +9,6 @@ import io.realm.annotations.RealmClass;
 @RealmClass
 public class HiitTimerSet extends RealmObject{
 
-    //TODO Make timer name dialog and revise the constructor!
-
     private String timerName;
     private int warmup;
     private int work;
@@ -25,7 +23,23 @@ public class HiitTimerSet extends RealmObject{
     public HiitTimerSet() {
     }
 
-    public HiitTimerSet(int warmup, int work, int rest, int reps, int cooldown, int total, String timerName, String workoutNames, String workSeconds, String restSeconds) {
+    public HiitTimerSet(int warmup, int reps, int cooldown, int total,
+                        String timerName, String workoutNames, String workSeconds, String restSeconds) {
+
+        this.warmup = warmup;
+        this.reps = reps;
+        this.cooldown = cooldown;
+        this.total = total;
+        this.timerName = timerName;
+        this.workoutNames = workoutNames;
+        this.workSeconds = workSeconds;
+        this.restSeconds = restSeconds;
+        this.work = Integer.parseInt(workSeconds.split("=")[0]);
+        this.rest = Integer.parseInt(restSeconds.split("=")[0]);
+    }
+
+    public HiitTimerSet(int warmup, int work, int rest, int reps, int cooldown, int total,
+                        String timerName, String workoutNames, String workSeconds, String restSeconds) {
         this.warmup = warmup;
         this.work = work;
         this.rest = rest;

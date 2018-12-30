@@ -39,7 +39,7 @@ public class GoPremiumActivity extends AppCompatActivity {
         setContentView(R.layout.activity_go_premium);
 
         String base64EncodedPublicKey = getResources().getString(R.string.app_license_key);
-        sharedPref = GoPremiumActivity.this.getSharedPreferences(MainActivity.sharedPrefOpenKey, Context.MODE_PRIVATE);
+        sharedPref = GoPremiumActivity.this.getSharedPreferences(getString(R.string.shared_pref_open_key), Context.MODE_PRIVATE);
         button = (Button) findViewById(R.id.go_premium_button);
 
         TextView mMusicTitle = (TextView) findViewById(R.id.music_title_tv);
@@ -74,8 +74,8 @@ public class GoPremiumActivity extends AppCompatActivity {
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Log.d(getClass().getSimpleName(), "" + sharedPref.getBoolean(MainActivity.sharedPrefPremiumKey, false));
-                if (!sharedPref.getBoolean(MainActivity.sharedPrefPremiumKey, false)) {
+//                Log.d(getClass().getSimpleName(), "" + sharedPref.getBoolean(MainActivity.sharedPrefPremiumKey, false));
+                if (!sharedPref.getBoolean(getString(R.string.shared_pref_premium_key), false)) {
                     try {
                         mHelper.launchPurchaseFlow(GoPremiumActivity.this, PREMIUM_SKU, 100012,
                                 mPurchaseFinishedListener, "");
@@ -102,7 +102,7 @@ public class GoPremiumActivity extends AppCompatActivity {
                 Toast.makeText(GoPremiumActivity.this, "Thanks for upgrading to premium!", Toast.LENGTH_SHORT).show();
                 Log.d(getClass().getSimpleName(), "Payment successful");
                 SharedPreferences.Editor editor = sharedPref.edit();
-                editor.putBoolean(MainActivity.sharedPrefPremiumKey, true);
+                editor.putBoolean(getString(R.string.shared_pref_premium_key), true);
                 editor.commit();
 
                 IsPremiumSingleton.getInstance().setPremium(true);

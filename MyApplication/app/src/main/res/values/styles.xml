@@ -12,6 +12,10 @@
         <item name="circularProgress">@drawable/progress_bar_circular</item>
         <item name="mainButton">@drawable/mainbutton_background</item>
         <item name="roundButton">@drawable/round_button_background</item>
+        <item name="rightArrowDrawable">@drawable/ic_keyboard_arrow_right</item>
+        <item name="leftArrowDrawable">@drawable/ic_keyboard_arrow_left</item>
+        <item name="advancedSettingDrawable">@drawable/ic_create</item>
+        <item name="alertDialogTheme">@style/dialog_theme_light</item>
         <!--<item name="android:windowAnimationStyle">@style/WindowAnimationTransition</item>-->
         <!--<item name="android:textColorSecondary">@color/dartThemeColorTextColor</item>-->
 
@@ -27,6 +31,10 @@
         <item name="circularProgress">@drawable/progress_bar_circular_pink</item>
         <item name="mainButton">@drawable/mainbutton_background_pink</item>
         <item name="roundButton">@drawable/round_button_background_pink</item>
+        <item name="rightArrowDrawable">@drawable/ic_keyboard_arrow_right</item>
+        <item name="leftArrowDrawable">@drawable/ic_keyboard_arrow_left</item>
+        <item name="advancedSettingDrawable">@drawable/ic_create</item>
+        <item name="alertDialogTheme">@style/dialog_theme_light</item>
         <!--<item name="android:windowAnimationStyle">@style/WindowAnimationTransition</item>-->
 
     </style>
@@ -41,6 +49,10 @@
         <item name="circularProgress">@drawable/progress_bar_circular_dark</item>
         <item name="mainButton">@drawable/mainbutton_background_dark</item>
         <item name="roundButton">@drawable/round_button_background_dark</item>
+        <item name="rightArrowDrawable">@drawable/ic_keyboard_arrow_right_white</item>
+        <item name="leftArrowDrawable">@drawable/ic_keyboard_arrow_left_white</item>
+        <item name="advancedSettingDrawable">@drawable/ic_create_white</item>
+        <item name="android:alertDialogTheme">@style/dialog_theme_dark</item>
         <!--<item name="android:windowAnimationStyle">@style/WindowAnimationTransition</item>-->
 
     </style>
@@ -55,6 +67,10 @@
         <item name="circularProgress">@drawable/progress_bar_circular_gray</item>
         <item name="mainButton">@drawable/mainbutton_background_gray</item>
         <item name="roundButton">@drawable/round_button_background_gray</item>
+        <item name="rightArrowDrawable">@drawable/ic_keyboard_arrow_right</item>
+        <item name="leftArrowDrawable">@drawable/ic_keyboard_arrow_left</item>
+        <item name="advancedSettingDrawable">@drawable/ic_create</item>
+        <item name="alertDialogTheme">@style/dialog_theme_light</item>
         <!--<item name="android:windowAnimationStyle">@style/WindowAnimationTransition</item>-->
 
 
@@ -70,6 +86,10 @@
         <item name="circularProgress">@drawable/progress_bar_circular_lime</item>
         <item name="mainButton">@drawable/mainbutton_background_lime</item>
         <item name="roundButton">@drawable/round_button_background_lime</item>
+        <item name="rightArrowDrawable">@drawable/ic_keyboard_arrow_right_white</item>
+        <item name="leftArrowDrawable">@drawable/ic_keyboard_arrow_left_white</item>
+        <item name="advancedSettingDrawable">@drawable/ic_create_white</item>
+        <item name="android:alertDialogTheme">@style/dialog_theme_dark</item>
         <!--<item name="android:windowAnimationStyle">@style/WindowAnimationTransition</item>-->
 
     </style>
@@ -78,6 +98,15 @@
         <item name="android:windowEnterAnimation">@android:anim/fade_in</item>
         <item name="android:windowExitAnimation">@android:anim/fade_out</item>
     </style>
+
+    <style name="dialog_theme_light" parent="Theme.AppCompat.Light.Dialog.Alert">
+        <item name="android:background">@android:color/background_light</item>
+    </style>
+
+    <style name="dialog_theme_dark" parent="Theme.AppCompat.Dialog.Alert">
+        <item name="android:background">@android:color/background_dark</item>
+    </style>
+
 
     <style name="CustomDialogTheme" parent="@android:style/Theme.Holo"/>
 

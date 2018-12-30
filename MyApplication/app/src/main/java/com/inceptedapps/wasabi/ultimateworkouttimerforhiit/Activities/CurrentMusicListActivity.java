@@ -99,7 +99,8 @@ public class CurrentMusicListActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         SongSingleton.getInstance().updateSelectedSongs();
-        SharedPreferences sharedPref = this.getSharedPreferences(MainActivity.sharedPrefOpenKey, Context.MODE_PRIVATE);
+        SharedPreferences sharedPref = this.getSharedPreferences(
+                getString(R.string.shared_pref_open_key), Context.MODE_PRIVATE);
 
         if (SongSingleton.getInstance().getSelectedSongs().size() != 0) {
             String savedSongIds = "";
@@ -111,14 +112,14 @@ public class CurrentMusicListActivity extends AppCompatActivity {
                 }
             }
             SharedPreferences.Editor editor = sharedPref.edit();
-            editor.putString(MainActivity.sharedPrefSongsKey, savedSongIds);
+            editor.putString(getString(R.string.shared_pref_songs_key), savedSongIds);
             editor.commit();
-            Log.d("SONG_", "Shared Pref = " + sharedPref.getString(MainActivity.sharedPrefSongsKey, "DEFAULT"));
+//            Log.d("SONG_", "Shared Pref = " + sharedPref.getString(MainActivity.sharedPrefSongsKey, "DEFAULT"));
         } else {
             SharedPreferences.Editor editor = sharedPref.edit();
-            editor.putString(MainActivity.sharedPrefSongsKey, "-1");
+            editor.putString(getString(R.string.shared_pref_songs_key), "-1");
             editor.commit();
-            Log.d("SONG_", "Shared Pref = " + sharedPref.getString(MainActivity.sharedPrefSongsKey, "DEFAULT"));
+//            Log.d("SONG_", "Shared Pref = " + sharedPref.getString(MainActivity.sharedPrefSongsKey, "DEFAULT"));
         }
         super.onPause();
     }

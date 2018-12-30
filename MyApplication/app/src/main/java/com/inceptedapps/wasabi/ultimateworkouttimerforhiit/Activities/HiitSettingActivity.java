@@ -18,7 +18,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -30,15 +29,20 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.inceptedapps.wasabi.ultimateworkouttimerforhiit.GoPremiumActivity;
+import com.inceptedapps.wasabi.ultimateworkouttimerforhiit.fragments.PresetSaveDialogFragment;
 import com.inceptedapps.wasabi.ultimateworkouttimerforhiit.hiit.HiitSingleton;
 import com.inceptedapps.wasabi.ultimateworkouttimerforhiit.hiit.HiitTimerSet;
 import com.inceptedapps.wasabi.ultimateworkouttimerforhiit.music.SongSingleton;
 import com.inceptedapps.wasabi.ultimateworkouttimerforhiit.custom.ThemeUtils;
 import com.inceptedapps.wasabi.ultimateworkouttimerforhiit.custom.TimerUtils;
 import com.inceptedapps.wasabi.ultimateworkouttimerforhiit.R;
+import com.inceptedapps.wasabi.ultimateworkouttimerforhiit.util.DateHelper;
+import com.inceptedapps.wasabi.ultimateworkouttimerforhiit.util.RoundHelper;
 
 import java.util.concurrent.TimeUnit;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
 import io.realm.Realm;
 
 public class HiitSettingActivity extends AppCompatActivity implements View.OnClickListener, View.OnFocusChangeListener {
@@ -49,21 +53,60 @@ public class HiitSettingActivity extends AppCompatActivity implements View.OnCli
     public static final String TOTAL_WORKOUT_TIME_RESULT_EXTRA_KEY = "TOTAL_WORKOUT_TIME_KEY";
     public static final String REPS_RESULT_EXTRA_KEY = "REPS_KEY";
 
-    private EditText editWarmup, editWork, editRest, editReps, editCooldown;
-    private TextView startButtonTextView, totalTextView, numOfMusicTextView;
-    private ImageView warmupLeftArrow, warmupRightArrow,
-            workLeftArrow, workRightArrow,
-            restLeftArrow, restRightArrow,
-            repsLeftArrow, repsRightArrow,
-            cooldownLeftArrow, cooldownRightArrow, advancedEditImageView;
+    private static final String PRESET_SAVE_DIALOG_TAG = "preset_dialog";
 
-    private CardView musicCard;
-    private RelativeLayout parentLayout;
+    @BindView(R.id.hitt_timer_setting_warmup_edit)
+    EditText editWarmup;
+    @BindView(R.id.hitt_timer_setting_work_edit)
+    EditText editWork;
+    @BindView(R.id.hitt_timer_setting_rest_edit)
+    EditText editRest;
+    @BindView(R.id.hitt_timer_setting_reps_edit)
+    EditText editReps;
+    @BindView(R.id.hitt_timer_setting_cooldown_edit)
+    EditText editCooldown;
+
+    @BindView(R.id.hitt_timer_setting_warmup_left_arrow)
+    ImageView warmupLeftArrow;
+    @BindView(R.id.hitt_timer_setting_warmup_right_arrow)
+    ImageView warmupRightArrow;
+    @BindView(R.id.hitt_timer_setting_work_left_arrow)
+    ImageView workLeftArrow;
+    @BindView(R.id.hitt_timer_setting_work_right_arrow)
+    ImageView workRightArrow;
+    @BindView(R.id.hitt_timer_setting_rest_left_arrow)
+    ImageView restLeftArrow;
+    @BindView(R.id.hitt_timer_setting_rest_right_arrow)
+    ImageView restRightArrow;
+    @BindView(R.id.hitt_timer_setting_reps_left_arrow)
+    ImageView repsLeftArrow;
+    @BindView(R.id.hitt_timer_setting_reps_right_arrow)
+    ImageView repsRightArrow;
+    @BindView(R.id.hitt_timer_setting_cooldown_left_arrow)
+    ImageView cooldownLeftArrow;
+    @BindView(R.id.hitt_timer_setting_cooldown_right_arrow)
+    ImageView cooldownRightArrow;
+    @BindView(R.id.hiit_timer_setting_advanced_edit_image_view)
+    ImageView advancedEditImageView;
+
+    @BindView(R.id.hiit_timer_setting_start_button)
+    TextView startButtonTextView;
+    @BindView(R.id.hiit_timer_setting_total_text)
+    TextView totalTextView;
+    @BindView(R.id.hiit_timer_setting_songs)
+    TextView numOfMusicTextView;
+
+    @BindView(R.id.hiit_timer_setting_music_card)
+    CardView musicCard;
+
+    @BindView(R.id.hiit_timer_setting_parent_relativelayout)
+    RelativeLayout parentLayout;
+
     private boolean isCanceled = false, isAdvancedSettingSet = false;
-    private String workoutNames, workSecs, restSecs;
+    private String customWorkoutNames, customWorkSecs, customRestSecs;
     private String finalWorkoutNames, finalWorkSecs, finalRestSecs;
     private int totalSecs;
-    private int retrievedReps;
+    private int customReps;
     private int theme;
 
     private Realm timerRealm;
@@ -72,72 +115,44 @@ public class HiitSettingActivity extends AppCompatActivity implements View.OnCli
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        ThemeUtils.changeToTheme(Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(this).getString(getResources().getString(R.string.SHARED_PREF_COLOR_THEME_KEY), "1")));
+        ThemeUtils.changeToTheme(Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(this)
+                .getString(getResources().getString(R.string.SHARED_PREF_COLOR_THEME_KEY), "1")));
         setTheme(ThemeUtils.themeSwitcher());
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_hiit_setting);
-
-        // ======================= Reference and toolbar setting ===========================
+        ButterKnife.bind(this);
 
         timerRealm = Realm.getDefaultInstance();
 
+        initToolbar();
+
+        initPreferences();
+
+        initListeners();
+
+    }
+
+
+    private void initToolbar() {
         Toolbar hiitTimerSetToolbar = (Toolbar) findViewById(R.id.hiit_timer_toolbar);
         hiitTimerSetToolbar.setTitleTextColor(Color.parseColor("#ffffff"));
         setSupportActionBar(hiitTimerSetToolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setTitle(getResources().getString(R.string.hiit_setting_toolbar));
+    }
 
+
+    private void initPreferences() {
         SharedPreferences defaultPref = PreferenceManager.getDefaultSharedPreferences(this);
         theme = Integer.parseInt(defaultPref.getString(getResources().getString(R.string.SHARED_PREF_COLOR_THEME_KEY), "1"));
-        isPremium = this.getSharedPreferences(MainActivity.sharedPrefOpenKey, Context.MODE_PRIVATE).getBoolean(MainActivity.sharedPrefPremiumKey, false);
-        Log.d(getClass().getSimpleName(), isPremium + "");
-
-        editWarmup = (EditText) findViewById(R.id.hitt_timer_setting_warmup_edit);
-        editWork = (EditText) findViewById(R.id.hitt_timer_setting_work_edit);
-        editRest = (EditText) findViewById(R.id.hitt_timer_setting_rest_edit);
-        editReps = (EditText) findViewById(R.id.hitt_timer_setting_reps_edit);
-        editCooldown = (EditText) findViewById(R.id.hitt_timer_setting_cooldown_edit);
-
-        startButtonTextView = (TextView) findViewById(R.id.hiit_timer_setting_start_button);
-        totalTextView = (TextView) findViewById(R.id.hiit_timer_setting_total_text);
-
-        musicCard = (CardView) findViewById(R.id.hiit_timer_setting_music_card);
-        if (musicCard != null) musicCard.setOnClickListener(this);
-
-        numOfMusicTextView = (TextView) findViewById(R.id.hiit_timer_setting_songs);
-
-        warmupLeftArrow = (ImageView) findViewById(R.id.hitt_timer_setting_warmup_left_arrow);
-        warmupRightArrow = (ImageView) findViewById(R.id.hitt_timer_setting_warmup_right_arrow);
-        workLeftArrow = (ImageView) findViewById(R.id.hitt_timer_setting_work_left_arrow);
-        workRightArrow = (ImageView) findViewById(R.id.hitt_timer_setting_work_right_arrow);
-        restLeftArrow = (ImageView) findViewById(R.id.hitt_timer_setting_rest_left_arrow);
-        restRightArrow = (ImageView) findViewById(R.id.hitt_timer_setting_rest_right_arrow);
-        repsLeftArrow = (ImageView) findViewById(R.id.hitt_timer_setting_reps_left_arrow);
-        repsRightArrow = (ImageView) findViewById(R.id.hitt_timer_setting_reps_right_arrow);
-        cooldownLeftArrow = (ImageView) findViewById(R.id.hitt_timer_setting_cooldown_left_arrow);
-        cooldownRightArrow = (ImageView) findViewById(R.id.hitt_timer_setting_cooldown_right_arrow);
-        advancedEditImageView = (ImageView) findViewById(R.id.hiit_timer_setting_advanced_edit_image_view);
-
-        if (theme == 3 || theme == 5) {
-            if (advancedEditImageView != null) advancedEditImageView.setImageResource(R.drawable.ic_create_white);
-
-            warmupLeftArrow.setImageResource(R.drawable.ic_keyboard_arrow_left_white);
-            workLeftArrow.setImageResource(R.drawable.ic_keyboard_arrow_left_white);
-            restLeftArrow.setImageResource(R.drawable.ic_keyboard_arrow_left_white);
-            repsLeftArrow.setImageResource(R.drawable.ic_keyboard_arrow_left_white);
-            cooldownLeftArrow.setImageResource(R.drawable.ic_keyboard_arrow_left_white);
-
-            warmupRightArrow.setImageResource(R.drawable.ic_keyboard_arrow_right_white);
-            workRightArrow.setImageResource(R.drawable.ic_keyboard_arrow_right_white);
-            restRightArrow.setImageResource(R.drawable.ic_keyboard_arrow_right_white);
-            repsRightArrow.setImageResource(R.drawable.ic_keyboard_arrow_right_white);
-            cooldownRightArrow.setImageResource(R.drawable.ic_keyboard_arrow_right_white);
-        }
-
-        parentLayout = (RelativeLayout) findViewById(R.id.hiit_timer_setting_parent_relativelayout);
+        isPremium = this.getSharedPreferences(
+                getString(R.string.shared_pref_open_key), Context.MODE_PRIVATE)
+                .getBoolean(getString(R.string.shared_pref_premium_key), false);
+    }
 
 
-        // ========================== Time trimming =================================
+    private void initListeners() {
+        musicCard.setOnClickListener(this);
 
         editWarmup.setOnFocusChangeListener(this);
         editWork.setOnFocusChangeListener(this);
@@ -157,85 +172,53 @@ public class HiitSettingActivity extends AppCompatActivity implements View.OnCli
         cooldownRightArrow.setOnClickListener(this);
         advancedEditImageView.setOnClickListener(this);
 
+        startButtonTextView.setOnClickListener(v -> startTimer());
+    }
 
-        // ====================== Passing data to service ==================================
 
-        startButtonTextView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                try {
-                    trimAllEditText();
-                    int warmupTime = TimerUtils.stringTimeToSeconds(editWarmup.getText().toString());
-                    int workTime = TimerUtils.stringTimeToSeconds(editWork.getText().toString());
-                    int restTime = TimerUtils.stringTimeToSeconds(editRest.getText().toString());
-                    int repsTime = Integer.parseInt(editReps.getText().toString());
-                    int cooldownTime = TimerUtils.stringTimeToSeconds(editCooldown.getText().toString());
-                    int totalTime = TimerUtils.stringTimeToSeconds(calculateTotalTime());
+    private void startTimer() {
+        try {
+            HiitTimerSet timerSet = getFinalizedSet();
 
-                    if (repsTime == 0) {
-                        Toast.makeText(HiitSettingActivity.this, "Please type at least 1 rep!", Toast.LENGTH_SHORT).show();
-                    } else if (warmupTime == 0 && workTime == 0 && restTime == 0 && cooldownTime == 0) {
-                        Toast.makeText(HiitSettingActivity.this, "This set's total time is 0 second!", Toast.LENGTH_SHORT).show();
-                    } else {
-                        if (!isAdvancedSettingSet) {
-                            finalWorkoutNames = "";
-                            finalWorkSecs = "";
-                            finalRestSecs = "";
-                            for (int i = 0; i < repsTime; i++) {
-                                finalWorkoutNames += "Sprint=";
-                                finalWorkSecs += workTime + "=";
-                                finalRestSecs += restTime + "=";
-                            }
-                            finalWorkoutNames = finalWorkoutNames.substring(0, finalWorkoutNames.length() - 1);
-                            finalWorkSecs = finalWorkSecs.substring(0, finalWorkSecs.length() - 1);
-                            finalRestSecs = finalRestSecs.substring(0, finalRestSecs.length() - 1);
-                        } else {
-                            finalWorkoutNames = workoutNames;
-                            finalWorkSecs = workSecs;
-                            finalRestSecs = restSecs;
-
-                            if (repsTime != retrievedReps) {
-                                String[] finalDetails = finalizeWorkoutDetails(repsTime, workTime, restTime, finalWorkoutNames, finalWorkSecs, finalRestSecs);
-                                finalWorkoutNames = finalDetails[0];
-                                finalWorkSecs = finalDetails[1];
-                                finalRestSecs = finalDetails[2];
-                                totalSecs = Integer.parseInt(finalDetails[3]);
-                                finalDetails = null;
-                            }
-
-                            totalTime = warmupTime + totalSecs + cooldownTime;
-                        }
-
-                        HiitSingleton.getInstance().addTimer(new HiitTimerSet(warmupTime, workTime, restTime, repsTime, cooldownTime, totalTime, "HIIT Timer", finalWorkoutNames, finalWorkSecs, finalRestSecs));
-                        Intent intent = new Intent(HiitSettingActivity.this, HiitTimerActivity.class);
-                        startActivityForResult(intent, 2);
-                    }
-                } catch (NumberFormatException e) {
-                    Toast.makeText(HiitSettingActivity.this, "Please type valid numbers!", Toast.LENGTH_SHORT).show();
-                }
+            if (timerSet.getReps() == 0) {
+                makeToast("The workout should have at least 1 rep!");
+            } else if (timerSet.getTotal() == 0) {
+                makeToast("This set's total time is 0 second!");
+            } else {
+                HiitSingleton.getInstance().addTimer(getFinalizedSet());
+                Intent intent = new Intent(HiitSettingActivity.this, HiitTimerActivity.class);
+                startActivityForResult(intent, 2);
             }
-        });
+
+        } catch (NullPointerException | NumberFormatException e) {
+            makeToast("Please type valid input");
+        }
+    }
+
+
+    private HiitTimerSet getFinalizedSet() {
+        return getFinalizedSet(RoundHelper.DEFAULT_TIMER_NAME);
+    }
+
+    private HiitTimerSet getFinalizedSet(String timerName) {
+        trimAllEditText();
+        int warmupTime = TimerUtils.stringTimeToSeconds(editWarmup.getText().toString());
+        int defaultWorkTime = TimerUtils.stringTimeToSeconds(editWork.getText().toString());
+        int defaultRestTime = TimerUtils.stringTimeToSeconds(editRest.getText().toString());
+        int defaultReps = Integer.parseInt(editReps.getText().toString());
+        int cooldownTime = TimerUtils.stringTimeToSeconds(editCooldown.getText().toString());
+
+        return RoundHelper.getFinalizedHiitTimerSet(
+                warmupTime, defaultWorkTime, defaultRestTime, defaultReps, cooldownTime,
+                customWorkSecs, customRestSecs, customWorkoutNames, customReps,
+                isAdvancedSettingSet, timerName);
     }
 
 
     private String calculateTotalTime() {
-        int currentReps = Integer.parseInt(editReps.getText().toString());
-        int currentWork = TimerUtils.stringTimeToSeconds(editWork.getText().toString());
-        int currentRest = TimerUtils.stringTimeToSeconds(editRest.getText().toString());
-        int currentWarmup = TimerUtils.stringTimeToSeconds(editWarmup.getText().toString());
-        int currentCooldown = TimerUtils.stringTimeToSeconds(editCooldown.getText().toString());
-        if (isAdvancedSettingSet) {
-            if (currentReps != retrievedReps) {
-                String[] currentDetails = finalizeWorkoutDetails(currentReps, currentWork, currentRest, workoutNames, workSecs, restSecs);
-                return TimerUtils.convertRawSecIntoString(Integer.parseInt(currentDetails[3]) + currentWarmup + currentCooldown);
-            } else {
-                return TimerUtils.convertRawSecIntoString(totalSecs + currentWarmup + currentCooldown);
-            }
-        } else {
-            int sec = currentWarmup + ((currentWork + currentReps) * currentReps) + currentReps;
-            return TimerUtils.convertRawSecIntoString(sec);
-        }
+        return TimerUtils.convertRawSecIntoString(getFinalizedSet().getTotal());
     }
+
 
     @Override
     public void onClick(View v) {
@@ -287,19 +270,19 @@ public class HiitSettingActivity extends AppCompatActivity implements View.OnCli
                     editReps.setText("1");
                 }
                 if (isAdvancedSettingSet) {
-                    if (currentReps != retrievedReps) {
+                    if (currentReps != customReps) {
                         String[] currentDetails = finalizeWorkoutDetails(currentReps,
                                 TimerUtils.stringTimeToSeconds(editWork.getText().toString()),
                                 TimerUtils.stringTimeToSeconds(editRest.getText().toString()),
-                                workoutNames, workSecs, restSecs);
-                        workoutNames = currentDetails[0];
-                        workSecs = currentDetails[1];
-                        restSecs = currentDetails[2];
+                                customWorkoutNames, customWorkSecs, customRestSecs);
+                        customWorkoutNames = currentDetails[0];
+                        customWorkSecs = currentDetails[1];
+                        customRestSecs = currentDetails[2];
                         currentDetails = null;
                     }
-                    advancedSettingIntent.putExtra(AdvancedSettingActivity.WORKOUT_NAME_DETAILS_KEY, workoutNames);
-                    advancedSettingIntent.putExtra(AdvancedSettingActivity.WORK_SECS_DETAILS_KEY, workSecs);
-                    advancedSettingIntent.putExtra(AdvancedSettingActivity.REST_SECS_DETAILS_KEY, restSecs);
+                    advancedSettingIntent.putExtra(AdvancedSettingActivity.WORKOUT_NAME_DETAILS_KEY, customWorkoutNames);
+                    advancedSettingIntent.putExtra(AdvancedSettingActivity.WORK_SECS_DETAILS_KEY, customWorkSecs);
+                    advancedSettingIntent.putExtra(AdvancedSettingActivity.REST_SECS_DETAILS_KEY, customRestSecs);
                 } else {
                     advancedSettingIntent.putExtra(AdvancedSettingActivity.WORKOUT_REPS_EXTRA_KEY, Integer.parseInt(editReps.getText().toString()));
                     advancedSettingIntent.putExtra(AdvancedSettingActivity.WORKOUT_WORK_TIME_EXTRA_KEY, TimerUtils.stringTimeToSeconds(editWork.getText().toString()));
@@ -387,15 +370,15 @@ public class HiitSettingActivity extends AppCompatActivity implements View.OnCli
     }
 
     private String[] finalizeWorkoutDetails(int repsTime, int workTime, int restTime, String workoutNames, String workSecs, String restSecs) {
-        if (repsTime > retrievedReps) {
-            for (int i = 0; i < repsTime - retrievedReps; i++) {
+        if (repsTime > customReps) {
+            for (int i = 0; i < repsTime - customReps; i++) {
                 workoutNames += "=Sprint";
                 workSecs += ("=" + workTime);
                 restSecs += ("=" + restTime);
             }
         }
-        if (repsTime < retrievedReps) {
-            for (int i = 0; i < retrievedReps - repsTime; i++) {
+        if (repsTime < customReps) {
+            for (int i = 0; i < customReps - repsTime; i++) {
                 workoutNames = workoutNames.substring(0, workoutNames.lastIndexOf("="));
                 workSecs = workSecs.substring(0, workSecs.lastIndexOf("="));
                 restSecs = restSecs.substring(0, restSecs.lastIndexOf("="));
@@ -414,12 +397,13 @@ public class HiitSettingActivity extends AppCompatActivity implements View.OnCli
         try {
             trimAllEditText();
         } catch (NumberFormatException e) {
-            Toast.makeText(HiitSettingActivity.this, "Please type valid numbers", Toast.LENGTH_SHORT).show();
+            makeToast("Please type valid input");
         }
+
         if (Integer.parseInt(editReps.getText().toString()) == 0) {
-            Toast.makeText(HiitSettingActivity.this, "Please type at least 1 rep!", Toast.LENGTH_SHORT).show();
+            makeToast("Please type at least 1 rep!");
         } else if (TimerUtils.stringTimeToSeconds(calculateTotalTime()) == 0) {
-            Toast.makeText(HiitSettingActivity.this, "This set's total time is 0 second!", Toast.LENGTH_SHORT).show();
+            makeToast("This set's total time is 0 second!");
         } else {
             if (isPremium || timerRealm.where(HiitTimerSet.class).findAll().size() < 3) {
                 if (theme == 3 || theme == 5) {
@@ -458,77 +442,19 @@ public class HiitSettingActivity extends AppCompatActivity implements View.OnCli
     }
 
     private void launchTimersetNameSettingDialog(int theme) {
-
-        final int warmupTime = TimerUtils.stringTimeToSeconds(editWarmup.getText().toString());
-        final int workTime = TimerUtils.stringTimeToSeconds(editWork.getText().toString());
-        final int restTime = TimerUtils.stringTimeToSeconds(editRest.getText().toString());
-        final int repsTime = Integer.parseInt(editReps.getText().toString());
-        final int cooldownTime = TimerUtils.stringTimeToSeconds(editCooldown.getText().toString());
-        final int totalTime = TimerUtils.stringTimeToSeconds(calculateTotalTime());
-
-        AlertDialog.Builder builder = new AlertDialog.Builder(HiitSettingActivity.this, theme);
-        View dialogView = HiitSettingActivity.this
-                .getLayoutInflater()
-                .inflate(R.layout.name_dialog, parentLayout, false);
-        builder.setView(dialogView);
-
-        final EditText nameEdit = (EditText) dialogView.findViewById(R.id.edittext);
-
-        builder.setTitle(getResources().getString(R.string.hiit_setting_preset_save_dialog));
-        builder.setPositiveButton("SAVE", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                String timerName = nameEdit.getText().toString();
-                if (nameEdit.getText().toString().isEmpty()) {
-                    timerName = "HIIT Timer";
-                }
-                HiitTimerSet newTimerSet = null;
-                if (!isAdvancedSettingSet) {
-                    workoutNames = "";
-                    workSecs = "";
-                    restSecs = "";
-                    for (int i = 0; i < repsTime; i++) {
-                        workoutNames += "Sprint=";
-                        workSecs += workTime + "=";
-                        restSecs += restTime + "=";
-                    }
-                    workoutNames = workoutNames.substring(0, workoutNames.length() - 1);
-                    workSecs = workSecs.substring(0, workSecs.length() - 1);
-                    restSecs = restSecs.substring(0, restSecs.length() - 1);
-                    newTimerSet =
-                            new HiitTimerSet(warmupTime, workTime, restTime, repsTime, cooldownTime, totalTime,
-                                    timerName, workoutNames, workSecs, restSecs);
-                } else {
-                    if (repsTime != retrievedReps) {
-                        String[] finalDetails = finalizeWorkoutDetails(repsTime, workTime, restTime,
-                                workoutNames, workSecs, restSecs);
-                        newTimerSet =
-                                new HiitTimerSet(warmupTime, workTime, restTime, repsTime, cooldownTime,
-                                        warmupTime + (Integer.parseInt(finalDetails[3])) + cooldownTime,
-                                        timerName, finalDetails[0], finalDetails[1], finalDetails[2]);
-                    } else {
-                        newTimerSet =
-                                new HiitTimerSet(warmupTime, workTime, restTime, repsTime, cooldownTime,
-                                        totalTime, timerName, workoutNames, workSecs, restSecs);
-                    }
-                }
-
-
-                timerRealm.beginTransaction();
-                timerRealm.copyToRealm(newTimerSet);
-                timerRealm.commitTransaction();
-                Snackbar.make(parentLayout, "Saved this preset", Snackbar.LENGTH_LONG).show();
-            }
-        });
-        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                isCanceled = true;
-                dialog.dismiss();
-            }
-        });
-        builder.create().show();
+        PresetSaveDialogFragment dialog = new PresetSaveDialogFragment();
+        dialog.show(getSupportFragmentManager(), PRESET_SAVE_DIALOG_TAG);
     }
+
+
+    public void savePreset(String timerName) {
+        timerRealm.beginTransaction();
+        timerRealm.copyToRealm(getFinalizedSet(timerName));
+        timerRealm.commitTransaction();
+        Snackbar.make(parentLayout, "Saved this preset", Snackbar.LENGTH_LONG).show();
+    }
+
+
 
     private void controlArrowAction(View view, int flag) {
         EditText currentEditText = (EditText) view;
@@ -629,19 +555,16 @@ public class HiitSettingActivity extends AppCompatActivity implements View.OnCli
         super.onActivityResult(requestCode, resultCode, data);
         if (resultCode == 1991) {
             isAdvancedSettingSet = true;
-            workoutNames = data.getStringExtra(WORKOUT_NAMES_RESULT_EXTRA_KEY);
-            workSecs = data.getStringExtra(WORK_TIME_RESULT_EXTRA_KEY);
-            restSecs = data.getStringExtra(REST_TIME_RESULT_EXTRA_KEY);
+            customWorkoutNames = data.getStringExtra(WORKOUT_NAMES_RESULT_EXTRA_KEY);
+            customWorkSecs = data.getStringExtra(WORK_TIME_RESULT_EXTRA_KEY);
+            customRestSecs = data.getStringExtra(REST_TIME_RESULT_EXTRA_KEY);
             totalSecs = data.getIntExtra(TOTAL_WORKOUT_TIME_RESULT_EXTRA_KEY, 0);
-            retrievedReps = data.getIntExtra(REPS_RESULT_EXTRA_KEY, Integer.parseInt(editReps.getText().toString()));
+            customReps = data.getIntExtra(REPS_RESULT_EXTRA_KEY, Integer.parseInt(editReps.getText().toString()));
 
             int rawTotal = TimerUtils.stringTimeToSeconds(editWarmup.getText().toString()) + totalSecs + TimerUtils.stringTimeToSeconds(editCooldown.getText().toString());
             totalTextView.setText(TimerUtils.convertRawSecIntoString(rawTotal));
-            editReps.setText(String.valueOf(retrievedReps));
+            editReps.setText(String.valueOf(customReps));
 
-            Log.d("RECEIVED_STRING", "Workout Names: " + workoutNames);
-            Log.d("RECEIVED_STRING", "Work seconds: " + workSecs);
-            Log.d("RECEIVED_STRING", "Rest Names: " + restSecs);
         }
         super.onActivityResult(requestCode, resultCode, data);
     }
@@ -685,5 +608,11 @@ public class HiitSettingActivity extends AppCompatActivity implements View.OnCli
         super.onDestroy();
         timerRealm.close();
     }
+
+
+    private void makeToast(String text) {
+        Toast.makeText(this, text, Toast.LENGTH_SHORT).show();
+    }
+
 }
 

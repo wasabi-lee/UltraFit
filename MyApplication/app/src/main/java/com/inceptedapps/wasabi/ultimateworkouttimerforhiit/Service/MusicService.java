@@ -17,6 +17,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
+import com.inceptedapps.wasabi.ultimateworkouttimerforhiit.R;
 import com.inceptedapps.wasabi.ultimateworkouttimerforhiit.activities.MainActivity;
 import com.inceptedapps.wasabi.ultimateworkouttimerforhiit.music.Song;
 import com.inceptedapps.wasabi.ultimateworkouttimerforhiit.music.SongSingleton;
@@ -90,7 +91,8 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
     }
 
     public void setShuffleOn() {
-        isShuffleOn = getSharedPreferences(MainActivity.sharedPrefOpenKey, Context.MODE_PRIVATE).getBoolean(MainActivity.sharedPrefShuffleKey, false);
+        isShuffleOn = getSharedPreferences(getString(R.string.shared_pref_open_key), Context.MODE_PRIVATE)
+                .getBoolean(getString(R.string.shared_pref_shuffle_key), false);
         if (isShuffleOn) {
             if (songs.size() != 0) {
                 songPosition = random.nextInt(songs.size());
