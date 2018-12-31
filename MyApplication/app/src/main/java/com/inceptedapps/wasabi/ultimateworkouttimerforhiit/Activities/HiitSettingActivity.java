@@ -105,9 +105,7 @@ public class HiitSettingActivity extends AppCompatActivity implements View.OnCli
 
     private boolean isAdvancedSettingSet = false;
     private String customWorkoutNames, customWorkSecs, customRestSecs;
-    private int totalSecs;
     private int customReps;
-    private int theme;
 
     private Realm timerRealm;
     private boolean isPremium;
@@ -135,7 +133,7 @@ public class HiitSettingActivity extends AppCompatActivity implements View.OnCli
 
 
     private void initToolbar() {
-        Toolbar hiitTimerSetToolbar = (Toolbar) findViewById(R.id.hiit_timer_toolbar);
+        Toolbar hiitTimerSetToolbar = findViewById(R.id.hiit_timer_toolbar);
         hiitTimerSetToolbar.setTitleTextColor(Color.parseColor("#ffffff"));
         setSupportActionBar(hiitTimerSetToolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -144,8 +142,6 @@ public class HiitSettingActivity extends AppCompatActivity implements View.OnCli
 
 
     private void initPreferences() {
-        SharedPreferences defaultPref = PreferenceManager.getDefaultSharedPreferences(this);
-        theme = Integer.parseInt(defaultPref.getString(getResources().getString(R.string.SHARED_PREF_COLOR_THEME_KEY), "1"));
         isPremium = this.getSharedPreferences(
                 getString(R.string.shared_pref_open_key), Context.MODE_PRIVATE)
                 .getBoolean(getString(R.string.shared_pref_premium_key), false);
@@ -181,6 +177,11 @@ public class HiitSettingActivity extends AppCompatActivity implements View.OnCli
         try {
             HiitTimerSet timerSet = getFinalizedSet();
 
+            if (timerSet == null) {
+                makeToast("Unexpected error occurred. Pleast try again!");
+                return;
+            }
+
             if (checkInput(timerSet)) throw new NumberFormatException("Number format error");
 
             HiitSingleton.getInstance().addTimer(getFinalizedSet());
@@ -194,11 +195,6 @@ public class HiitSettingActivity extends AppCompatActivity implements View.OnCli
 
 
     private HiitTimerSet getFinalizedSet() {
-        return getFinalizedSet(RoundHelper.DEFAULT_TIMER_NAME);
-    }
-
-
-    private HiitTimerSet getFinalizedSet(String timerName) {
         if (trimAllEditText()) {
             int warmupTime = TimerUtils.stringTimeToSeconds(editWarmup.getText().toString());
             int defaultWorkTime = TimerUtils.stringTimeToSeconds(editWork.getText().toString());
@@ -209,14 +205,20 @@ public class HiitSettingActivity extends AppCompatActivity implements View.OnCli
             return RoundHelper.getFinalizedHiitTimerSet(
                     warmupTime, defaultWorkTime, defaultRestTime, defaultReps, cooldownTime,
                     customWorkSecs, customRestSecs, customWorkoutNames, customReps,
-                    isAdvancedSettingSet, timerName);
+                    isAdvancedSettingSet);
         }
         return null;
     }
 
 
     private String calculateTotalTime() {
-        return TimerUtils.convertRawSecIntoString(getFinalizedSet().getTotal());
+        try {
+            return TimerUtils.convertRawSecIntoString(getFinalizedSet().getTotal());
+        } catch (NullPointerException | NumberFormatException e) {
+            e.printStackTrace();
+            makeToast("Unexpected error occurred. Please try again later!");
+            return "00:00";
+        }
     }
 
 
@@ -225,7 +227,7 @@ public class HiitSettingActivity extends AppCompatActivity implements View.OnCli
         switch (v.getId()) {
             case R.id.hitt_timer_setting_warmup_left_arrow:
                 editWarmup.requestFocus();
-                controlArrowAction(editWarmup, 0);
+                controlArrowAction(editWarmup, -1);
                 break;
             case R.id.hitt_timer_setting_warmup_right_arrow:
                 editWarmup.requestFocus();
@@ -233,7 +235,7 @@ public class HiitSettingActivity extends AppCompatActivity implements View.OnCli
                 break;
             case R.id.hitt_timer_setting_work_left_arrow:
                 editWork.requestFocus();
-                controlArrowAction(editWork, 0);
+                controlArrowAction(editWork, -1);
                 break;
             case R.id.hitt_timer_setting_work_right_arrow:
                 editWork.requestFocus();
@@ -241,7 +243,7 @@ public class HiitSettingActivity extends AppCompatActivity implements View.OnCli
                 break;
             case R.id.hitt_timer_setting_rest_left_arrow:
                 editRest.requestFocus();
-                controlArrowAction(editRest, 0);
+                controlArrowAction(editRest, -1);
                 break;
             case R.id.hitt_timer_setting_rest_right_arrow:
                 editRest.requestFocus();
@@ -249,15 +251,15 @@ public class HiitSettingActivity extends AppCompatActivity implements View.OnCli
                 break;
             case R.id.hitt_timer_setting_reps_left_arrow:
                 editReps.requestFocus();
-                controlArrowAction(editReps, 3);
+                controlArrowAction(editReps, -1);
                 break;
             case R.id.hitt_timer_setting_reps_right_arrow:
                 editReps.requestFocus();
-                controlArrowAction(editReps, 4);
+                controlArrowAction(editReps, 1);
                 break;
             case R.id.hitt_timer_setting_cooldown_left_arrow:
                 editCooldown.requestFocus();
-                controlArrowAction(editCooldown, 0);
+                controlArrowAction(editCooldown, -1);
                 break;
             case R.id.hitt_timer_setting_cooldown_right_arrow:
                 editCooldown.requestFocus();
@@ -280,7 +282,7 @@ public class HiitSettingActivity extends AppCompatActivity implements View.OnCli
             EditText currentEditText = (EditText) v;
             if (currentEditText.getId() == R.id.hitt_timer_setting_reps_edit)
                 checkRepCount(currentEditText);
-             else
+            else
                 trimEditText(currentEditText);
             totalTextView.setText(calculateTotalTime());
         } catch (Exception e) {
@@ -320,7 +322,7 @@ public class HiitSettingActivity extends AppCompatActivity implements View.OnCli
         Intent advanceIntent = new Intent(HiitSettingActivity.this, AdvancedSettingActivity.class);
         HiitTimerSet set = getFinalizedSet();
 
-        if (!checkInput(set)) return;
+        if (set == null || !checkInput(set)) return;
 
         advanceIntent.putExtra(AdvancedSettingActivity.WORKOUT_NAME_DETAILS_KEY, set.getWorkoutNames());
         advanceIntent.putExtra(AdvancedSettingActivity.WORK_SECS_DETAILS_KEY, set.getWorkSeconds());
@@ -356,13 +358,31 @@ public class HiitSettingActivity extends AppCompatActivity implements View.OnCli
 
     public void startPresetSaveFlow() {
         currentPrset = getFinalizedSet();
-        if (checkInput(currentPrset)) {
+        if (currentPrset == null || checkInput(currentPrset)) {
             if (isPremium || timerRealm.where(HiitTimerSet.class).findAll().size() < 3) {
                 launchTimersetNameSettingDialog();
             } else {
                 launchBuyPremiumDialog();
             }
         }
+    }
+
+
+    private void launchTimersetNameSettingDialog() {
+        PresetSaveDialogFragment dialog = new PresetSaveDialogFragment();
+        dialog.show(getSupportFragmentManager(), PRESET_SAVE_DIALOG_TAG);
+    }
+
+
+    public void savePreset(String timerName) {
+        if (currentPrset == null) {
+            makeToast("Unexpected error occurred. Please try again later!");
+        }
+        currentPrset.setTimerName(timerName);
+        timerRealm.beginTransaction();
+        timerRealm.copyToRealm(currentPrset);
+        timerRealm.commitTransaction();
+        Snackbar.make(parentLayout, "Saved this preset", Snackbar.LENGTH_LONG).show();
     }
 
 
@@ -390,77 +410,24 @@ public class HiitSettingActivity extends AppCompatActivity implements View.OnCli
     }
 
 
-    private void launchTimersetNameSettingDialog() {
-        PresetSaveDialogFragment dialog = new PresetSaveDialogFragment();
-        dialog.show(getSupportFragmentManager(), PRESET_SAVE_DIALOG_TAG);
-    }
-
-
-    public void savePreset(String timerName) {
-        if (currentPrset == null) {
-            makeToast("Unexpected error occurred. Please try again later!");
-        }
-        currentPrset.setTimerName(timerName);
-        timerRealm.beginTransaction();
-        timerRealm.copyToRealm(currentPrset);
-        timerRealm.commitTransaction();
-        Snackbar.make(parentLayout, "Saved this preset", Snackbar.LENGTH_LONG).show();
-    }
-
-
-    private void controlArrowAction(View view, int flag) {
-        EditText currentEditText = (EditText) view;
-        String currentTime = currentEditText.getText().toString();
-        String[] currentMinSec = currentTime.split(":");
-        if (currentMinSec.length == 2) {
-            if (flag == 1) { // if the user clicked right arrow, add 1 more second
-                if (currentMinSec[1].equals("59")) {
-                    currentMinSec[1] = "00";
-                    currentMinSec[0] = String.valueOf(Integer.parseInt(currentMinSec[0]) + 1);
-                } else {
-                    currentMinSec[1] = String.valueOf(Integer.parseInt(currentMinSec[1]) + 1);
-                }
-                String trimmedMinSec = trimTimeString(currentMinSec);
-                ((EditText) view).setText(trimmedMinSec);
-            } else if (flag == 0) { // If the user clicked left arrow, subtract 1 second from the original time
-                if (!currentTime.equals("00:00")) {
-                    if (currentMinSec[1].equals("00")) {
-                        currentMinSec[1] = "59";
-                        currentMinSec[0] = String.valueOf(Integer.parseInt(currentMinSec[0]) - 1);
-                    } else {
-                        currentMinSec[1] = String.valueOf(Integer.parseInt(currentMinSec[1]) - 1);
-                    }
-                    String trimmedMinSec = trimTimeString(currentMinSec);
-                    ((EditText) view).setText(trimmedMinSec);
-                }
-            }
-            currentMinSec = null;
+    private void controlArrowAction(EditText view, int offset) {
+        if (view.getId() == R.id.hitt_timer_setting_reps_edit) {
+            int currentReps = Integer.parseInt(view.getText().toString());
+            int adjustedRep = currentReps + offset;
+            view.setText(adjustedRep <= 0 ? 1 : adjustedRep);
         } else {
-            if (flag == 3) { // If the user clicked the left arrow of the reps EditText, subtract 1 second from the original reps
-                if (Integer.parseInt(currentTime) > 1) {
-                    String currentReps = String.valueOf(Integer.parseInt(currentTime) - 1);
-                    currentEditText.setText(currentReps);
-                } else {
-                    currentEditText.setText(getResources().getString(R.string.hiit_setting_default_reps));
-                }
-            } else if (flag == 4) { // If the user clicked the right arrow of the reps EditText, add 1 more rep
-                String currentReps = String.valueOf(Integer.parseInt(currentTime) + 1);
-                currentEditText.setText(currentReps);
-            } else {
-                currentEditText.setText(getResources().getString(R.string.hiit_setting_default_second));
-            }
-            trimAllEditText();
+            view.setText(TimerUtils.convertUserInputToValidStringWithOffset(view.getText().toString(), offset));
         }
         totalTextView.setText(calculateTotalTime());
-        currentEditText = null;
     }
+
 
     private boolean trimAllEditText() {
         try {
-            editWarmup.setText(trimTimeString(editWarmup.getText().toString().split(":")));
-            editWork.setText(trimTimeString(editWork.getText().toString().split(":")));
-            editRest.setText(trimTimeString(editRest.getText().toString().split(":")));
-            editCooldown.setText(trimTimeString(editCooldown.getText().toString().split(":")));
+            editWarmup.setText(TimerUtils.convertUserInputToValidString(editWarmup.getText().toString()));
+            editWork.setText(TimerUtils.convertUserInputToValidString(editWork.getText().toString()));
+            editRest.setText(TimerUtils.convertUserInputToValidString(editRest.getText().toString()));
+            editCooldown.setText(TimerUtils.convertUserInputToValidString(editCooldown.getText().toString()));
         } catch (NumberFormatException e) {
             e.printStackTrace();
             makeToast("Please type valid input");
@@ -469,45 +436,6 @@ public class HiitSettingActivity extends AppCompatActivity implements View.OnCli
         return true;
     }
 
-    private String trimTimeString(String[] minAndSec) {
-        int min = 0;
-        int sec = 0;
-        if (minAndSec.length == 2) {
-            if (minAndSec[0].isEmpty()) {
-                minAndSec[0] = "00";
-            }
-            min = Integer.parseInt(minAndSec[0]);
-            sec = Integer.parseInt(minAndSec[1]);
-        } else if (minAndSec.length == 1) {
-            if (!(minAndSec[0].isEmpty())) {
-                sec = Integer.parseInt(minAndSec[0]);
-            }
-        }
-        minAndSec = null;
-        String minString = "00";
-        String secString = "00";
-
-
-        if (sec >= 60) {
-            int oldMin = min;
-            min = (int) (TimeUnit.SECONDS.toMinutes(sec));
-            sec = (int) (sec - TimeUnit.MINUTES.toSeconds(min));
-            min = min + oldMin;
-        }
-
-        if (min < 10) {
-            minString = "0" + min;
-        } else {
-            minString = String.valueOf(min);
-        }
-        if (sec < 10) {
-            secString = "0" + sec;
-        } else {
-            secString = String.valueOf(sec);
-        }
-
-        return minString + ":" + secString;
-    }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -517,7 +445,6 @@ public class HiitSettingActivity extends AppCompatActivity implements View.OnCli
             customWorkoutNames = data.getStringExtra(WORKOUT_NAMES_RESULT_EXTRA_KEY);
             customWorkSecs = data.getStringExtra(WORK_TIME_RESULT_EXTRA_KEY);
             customRestSecs = data.getStringExtra(REST_TIME_RESULT_EXTRA_KEY);
-            totalSecs = data.getIntExtra(TOTAL_WORKOUT_TIME_RESULT_EXTRA_KEY, 0);
             customReps = data.getIntExtra(REPS_RESULT_EXTRA_KEY, Integer.parseInt(editReps.getText().toString()));
 
             totalTextView.setText(calculateTotalTime());
@@ -525,12 +452,12 @@ public class HiitSettingActivity extends AppCompatActivity implements View.OnCli
         }
     }
 
+
     @Override
     protected void onResume() {
         if (SongSingleton.getInstance().getSelectedSongIds() != null) {
             String currentSongs = "Current songs : " + SongSingleton.getInstance().getSelectedSongIds().length;
             numOfMusicTextView.setText(currentSongs);
-            currentSongs = null;
         } else {
             numOfMusicTextView.setText(getResources().getString(R.string.hiit_setting_num_of_music));
         }
@@ -571,6 +498,4 @@ public class HiitSettingActivity extends AppCompatActivity implements View.OnCli
     private void makeToast(String text) {
         Toast.makeText(this, text, Toast.LENGTH_SHORT).show();
     }
-
 }
-

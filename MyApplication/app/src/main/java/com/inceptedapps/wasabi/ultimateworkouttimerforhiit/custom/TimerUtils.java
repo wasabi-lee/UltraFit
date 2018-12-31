@@ -14,6 +14,12 @@ public class TimerUtils {
         return convertRawSecIntoString(TimerUtils.stringTimeToSeconds(userInput));
     }
 
+
+    public static String convertUserInputToValidStringWithOffset(String userInput, int offset) {
+        return convertRawSecIntoString(TimerUtils.stringTimeToSecondWithOffset(userInput, offset));
+    }
+
+
     /***
      *
      * Changes a raw second data (67 seconds) into a four digit string form (01:07.)
@@ -78,14 +84,33 @@ public class TimerUtils {
             return 0;
         }
         String[] rawMinSec = rawTime.split(":");
-        if (rawMinSec.length == 2) {
-            int rawMin = Integer.parseInt(rawMinSec[0]);
-            int rawSec = Integer.parseInt(rawMinSec[1]);
+
+        if (rawMinSec.length >= 3) return -1;
+
+        else if (rawMinSec.length == 2) {
+            int rawMin = (rawMinSec[0].equals("") || rawMinSec[0].equals(" ")) ?
+                    0 : Integer.parseInt(rawMinSec[0]);
+            int rawSec = (rawMinSec[1].equals("") || rawMinSec[1].equals(" ")) ?
+                    0 : Integer.parseInt(rawMinSec[1]);
             int minIntoSec = (int) TimeUnit.MINUTES.toSeconds(rawMin);
             return minIntoSec + rawSec;
-        } else if(rawMinSec.length == 1){
+        }
+
+        else if(rawMinSec.length == 1){
             return Integer.parseInt(rawMinSec[0]);
         }
+
         return -1;
+    }
+
+
+    public static int stringTimeToSecondWithOffset(String input, int offset) {
+        try {
+            int result = stringTimeToSeconds(input);
+            return (result + offset) < 0 ? 0 : result + offset;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return -1;
+        }
     }
 }

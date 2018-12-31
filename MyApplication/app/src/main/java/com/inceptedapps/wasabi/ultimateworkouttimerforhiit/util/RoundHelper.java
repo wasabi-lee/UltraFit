@@ -11,6 +11,18 @@ public class RoundHelper {
             int warmupTime, int defaultWorkTime, int defaultRestTime,
             int defaultReps, int cooldownTime,
             String customWorkTime, String customRestTime, String customWorkoutNames,
+            int customReps, boolean isAdvancedSettingSet) {
+
+        return getFinalizedHiitTimerSet(warmupTime, defaultWorkTime, defaultRestTime,
+                defaultReps, cooldownTime, customWorkTime, customRestTime, customWorkoutNames,
+                customReps, isAdvancedSettingSet, DEFAULT_TIMER_NAME);
+    }
+
+
+    public static HiitTimerSet getFinalizedHiitTimerSet(
+            int warmupTime, int defaultWorkTime, int defaultRestTime,
+            int defaultReps, int cooldownTime,
+            String customWorkTime, String customRestTime, String customWorkoutNames,
             int customReps, boolean isAdvancedSettingSet, String timerName) {
 
 
@@ -56,16 +68,16 @@ public class RoundHelper {
      * Adjusts the workout rounds based on the default rep count.
      * This method will be called when the user customized the workout in the advanced setting and
      * adjust the rep count in the main setting menu again.
-     *
+     * <p>
      * This method is to address that difference between customizedReps and default(final)Reps.
      *
-     * @param defaultReps The rep count that will work as a standard.
-     * @param customReps The rep count that will be compared to the defaultReps.
+     * @param defaultReps     The rep count that will work as a standard.
+     * @param customReps      The rep count that will be compared to the defaultReps.
      * @param defaultWorkTime The workout time that will be used when appending more rounds
      * @param defaultRestTime The rest time that will be used when appending more rounds
-     * @param workoutNames The stringbuilder that will hold the finalized workout names
-     * @param workSecs The stringbuilder that will hold the finalized workout seconds
-     * @param restSecs The stringbuilder that will hold the finalized rest seconds
+     * @param workoutNames    The stringbuilder that will hold the finalized workout names
+     * @param workSecs        The stringbuilder that will hold the finalized workout seconds
+     * @param restSecs        The stringbuilder that will hold the finalized rest seconds
      */
     private static void adjustWorkoutRounds(int defaultReps, int customReps, int defaultWorkTime, int defaultRestTime,
                                             StringBuilder workoutNames, StringBuilder workSecs, StringBuilder restSecs) {
