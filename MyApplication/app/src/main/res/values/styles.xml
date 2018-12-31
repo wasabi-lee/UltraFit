@@ -16,6 +16,7 @@
         <item name="leftArrowDrawable">@drawable/ic_keyboard_arrow_left</item>
         <item name="advancedSettingDrawable">@drawable/ic_create</item>
         <item name="alertDialogTheme">@style/dialog_theme_light</item>
+        <item name="musicDrawerBackground">@android:color/background_light</item>
         <!--<item name="android:windowAnimationStyle">@style/WindowAnimationTransition</item>-->
         <!--<item name="android:textColorSecondary">@color/dartThemeColorTextColor</item>-->
 
@@ -35,6 +36,7 @@
         <item name="leftArrowDrawable">@drawable/ic_keyboard_arrow_left</item>
         <item name="advancedSettingDrawable">@drawable/ic_create</item>
         <item name="alertDialogTheme">@style/dialog_theme_light</item>
+        <item name="musicDrawerBackground">@android:color/background_light</item>
         <!--<item name="android:windowAnimationStyle">@style/WindowAnimationTransition</item>-->
 
     </style>
@@ -53,6 +55,7 @@
         <item name="leftArrowDrawable">@drawable/ic_keyboard_arrow_left_white</item>
         <item name="advancedSettingDrawable">@drawable/ic_create_white</item>
         <item name="android:alertDialogTheme">@style/dialog_theme_dark</item>
+        <item name="musicDrawerBackground">@android:color/background_dark</item>
         <!--<item name="android:windowAnimationStyle">@style/WindowAnimationTransition</item>-->
 
     </style>
@@ -71,6 +74,7 @@
         <item name="leftArrowDrawable">@drawable/ic_keyboard_arrow_left</item>
         <item name="advancedSettingDrawable">@drawable/ic_create</item>
         <item name="alertDialogTheme">@style/dialog_theme_light</item>
+        <item name="musicDrawerBackground">@android:color/background_light</item>
         <!--<item name="android:windowAnimationStyle">@style/WindowAnimationTransition</item>-->
 
 
@@ -90,6 +94,7 @@
         <item name="leftArrowDrawable">@drawable/ic_keyboard_arrow_left_white</item>
         <item name="advancedSettingDrawable">@drawable/ic_create_white</item>
         <item name="android:alertDialogTheme">@style/dialog_theme_dark</item>
+        <item name="musicDrawerBackground">@android:color/background_dark</item>
         <!--<item name="android:windowAnimationStyle">@style/WindowAnimationTransition</item>-->
 
     </style>

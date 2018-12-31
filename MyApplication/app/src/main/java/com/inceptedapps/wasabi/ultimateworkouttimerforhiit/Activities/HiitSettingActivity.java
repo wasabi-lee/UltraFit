@@ -182,13 +182,15 @@ public class HiitSettingActivity extends AppCompatActivity implements View.OnCli
                 return;
             }
 
-            if (checkInput(timerSet)) throw new NumberFormatException("Number format error");
-
+            if (!checkInput(timerSet)) {
+                throw new NumberFormatException("Number format error");
+            }
             HiitSingleton.getInstance().addTimer(getFinalizedSet());
             Intent intent = new Intent(HiitSettingActivity.this, HiitTimerActivity.class);
             startActivityForResult(intent, 2);
 
         } catch (NullPointerException | NumberFormatException e) {
+            e.printStackTrace();
             makeToast("Please type valid input");
         }
     }
@@ -414,7 +416,7 @@ public class HiitSettingActivity extends AppCompatActivity implements View.OnCli
         if (view.getId() == R.id.hitt_timer_setting_reps_edit) {
             int currentReps = Integer.parseInt(view.getText().toString());
             int adjustedRep = currentReps + offset;
-            view.setText(adjustedRep <= 0 ? 1 : adjustedRep);
+            view.setText(String.valueOf(adjustedRep <= 0 ? 1 : adjustedRep));
         } else {
             view.setText(TimerUtils.convertUserInputToValidStringWithOffset(view.getText().toString(), offset));
         }

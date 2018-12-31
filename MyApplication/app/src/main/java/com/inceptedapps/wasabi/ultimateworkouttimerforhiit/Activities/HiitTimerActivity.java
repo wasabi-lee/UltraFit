@@ -57,6 +57,8 @@ import com.inceptedapps.wasabi.ultimateworkouttimerforhiit.progress.WorkoutLog;
 import com.inceptedapps.wasabi.ultimateworkouttimerforhiit.R;
 import com.inceptedapps.wasabi.ultimateworkouttimerforhiit.service.KillNotificationsService;
 import com.inceptedapps.wasabi.ultimateworkouttimerforhiit.service.MusicService;
+import com.inceptedapps.wasabi.ultimateworkouttimerforhiit.util.SharedPrefHelper;
+import com.inceptedapps.wasabi.ultimateworkouttimerforhiit.util.SoundIdSwitcher;
 import com.squareup.picasso.Picasso;
 
 import java.text.SimpleDateFormat;
@@ -64,6 +66,8 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
 import io.realm.Realm;
 import io.realm.RealmList;
 import io.realm.RealmResults;
@@ -74,9 +78,65 @@ public class HiitTimerActivity extends AppCompatActivity implements View.OnClick
 
     private static final String TAG = HiitTimerActivity.class.getSimpleName();
     private static final String NOTIFICATION_ID_KEY = "notif_id_key";
-    private DrawerLayout mDrawerLayout;
+
+    @BindView(R.id.music_drawer)
+    DrawerLayout mDrawerLayout;
+
+    @BindView(R.id.hiit_timer_mins_textView)
+    TextView mTimerMinsTextView;
+
+    @BindView(R.id.hiit_timer_seconds_textView)
+    TextView mTimerSecsTextView;
+
+    @BindView(R.id.hiit_timer_total_textView)
+    TextView mTotalTextView;
+
+    @BindView(R.id.hiit_timer_workout_textView)
+    TextView mWorkoutTextView;
+
+    @BindView(R.id.hiit_timer_reps_textView)
+    TextView mRepsTextView;
+
+    @BindView(R.id.no_music_text)
+    TextView mNoMusicText;
+
+    @BindView(R.id.hiit_timer_progressBar)
+    ProgressBar mProgressBar;
+
+    @BindView(R.id.hiit_timer_album_art)
+    ImageView mAlbumArt;
+
+    @BindView(R.id.drawer_skip_next_icon)
+    ImageView mSkipNextIcon;
+
+    @BindView(R.id.drawer_skip_prev_icon)
+    ImageView mSkipPrevIcon;
+
+    @BindView(R.id.drawer_play_pause_icon)
+    ImageView mPlayPauseIcon;
+
+    @BindView(R.id.drawer_shuffle_icon)
+    ImageView mShuffleIcon;
+
+    @BindView(R.id.no_music_background)
+    ImageView mNoMusicBackground;
+
+    @BindView(R.id.hiit_timer_song_name)
+    TextView mSongName;
+
+    @BindView(R.id.hiit_timer_artist)
+    TextView mArtist;
+
+    @BindView(R.id.music_drawer_button)
+    ImageView mMusicDrawerButton;
+
+    @BindView(R.id.adView)
+    AdView mAdView;
+
+    @BindView(R.id.hiit_timer_song_list)
+    ListView mDrawerList;
+
     private boolean isMusicModeOn, isTimerActive = true, isTimerStopped;
-    private ListView mDrawerList;
     private MusicDrawerListAdapter mAdapter;
     private ArrayList<Song> mSongList;
     private boolean isConfigChanged = false;
@@ -88,12 +148,8 @@ public class HiitTimerActivity extends AppCompatActivity implements View.OnClick
     private int songPosition;
     private long mBeepDuration = 1000;
 
-    TextView mTimerMinsTextView, mTimerSecsTextView, mTotalTextView, mWorkoutTextView, mRepsTextView, mNoMusicText;
     float workoutTvSize;
-    ProgressBar mProgressBar;
     HiitTimerSet hiitTimerSet;
-    ImageView mAlbumArt, mSkipNextIcon, mSkipPrevIcon, mPlayPauseIcon, mShuffleIcon, mNoMusicBackground;
-    TextView mSongName, mArtist;
 
     //Keys
     public static final String WORKOUT_NAMES_KEY = "workout_names_key";
@@ -144,6 +200,7 @@ public class HiitTimerActivity extends AppCompatActivity implements View.OnClick
     private TimerFragment timerFragment;
     private static final String FRAGMENT_TAG = "fragment_tag";
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         ThemeUtils.changeToTheme(Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(this).getString(getResources().getString(R.string.SHARED_PREF_COLOR_THEME_KEY), "1")));
@@ -151,12 +208,10 @@ public class HiitTimerActivity extends AppCompatActivity implements View.OnClick
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_hiit_timer);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        ButterKnife.bind(this);
 
 
-        Log.d(TAG, "onCreate: ");
-        sharedPref = getSharedPreferences(getString(R.string.shared_pref_open_key), Context.MODE_PRIVATE);
-        isPremium = sharedPref.getBoolean(getString(R.string.shared_pref_premium_key), false);
-        Log.d(getClass().getSimpleName(), "Is Premium: " + isPremium);
+        isPremium = SharedPrefHelper.isPremium(this);
 
 
         initializeAds();
@@ -181,12 +236,12 @@ public class HiitTimerActivity extends AppCompatActivity implements View.OnClick
             isTimerStopped = savedInstanceState.getBoolean(IS_TIMER_PAUSED_BEFORE_CONFIG_CHANGE);
 
             Log.d(TAG, "onCreate: Remaining time: " + currentSeconds +
-            ", isTimerActive: "+isTimerActive +
-            ", isTimerStopped: "+isTimerStopped +
-            ", Duration: "+duration+
-            ", reps: " + reps +
-            ", action: " + action +
-            ", total: " + totalSecsToGo);
+                    ", isTimerActive: " + isTimerActive +
+                    ", isTimerStopped: " + isTimerStopped +
+                    ", Duration: " + duration +
+                    ", reps: " + reps +
+                    ", action: " + action +
+                    ", total: " + totalSecsToGo);
 
             mProgressBar.setMax(duration * 100);
             mProgressBar.setProgress(currentSeconds);
@@ -220,7 +275,6 @@ public class HiitTimerActivity extends AppCompatActivity implements View.OnClick
     }
 
     private void initializeAds() {
-        AdView mAdView = (AdView) findViewById(R.id.adView);
         if (mAdView != null) {
             if (!isPremium) {
                 AdRequest adRequest = new AdRequest.Builder().build();
@@ -234,40 +288,35 @@ public class HiitTimerActivity extends AppCompatActivity implements View.OnClick
     }
 
     private void retrieveSharedPrefValues() {
-        SharedPreferences defaultPref = PreferenceManager.getDefaultSharedPreferences(HiitTimerActivity.this);
 
-        isOverlapAllowed = defaultPref.getBoolean(getResources().getString(R.string.SHARED_PREF_CUE_OVERLAP_KEY), false);
-        isVibrationAllowed = defaultPref.getBoolean(getResources().getString(R.string.SHARED_PREF_VIBRATION_KEY), true);
-        tickCount = Integer.parseInt(defaultPref.getString(getResources().getString(R.string.SHARED_PREF_TRANSITION_TICKS_KEY), "3"));
+        isOverlapAllowed = SharedPrefHelper.shouldMusicOverlapCue(this);
+        isVibrationAllowed = SharedPrefHelper.isVibrationEnabled(this);
+        tickCount = Integer.parseInt(SharedPrefHelper.getTickCounts(this));
+        themeMode = Integer.parseInt(SharedPrefHelper.getThemeId(this));
+
         isMusicModeOn = SongSingleton.getInstance().getSelectedSongs().size() != 0;
-        themeMode = Integer.parseInt(defaultPref.getString(getResources().getString(R.string.SHARED_PREF_COLOR_THEME_KEY), "1"));
 
         int beepTheme = 1;
         int tickTheme = 1;
         try {
-            beepTheme = defaultPref.getInt(getResources().getString(R.string.SHARED_PREF_BEEP_SOUND_SELECTION_KEY), 1);
-            tickTheme = defaultPref.getInt(getResources().getString(R.string.SHARED_PREF_TICK_SOUND_SELECTION_KEY), 1);
-        } catch (Exception e ){
+            beepTheme = SharedPrefHelper.getBeepSoundId(this);
+            tickTheme = SharedPrefHelper.getTickSoundId(this);
+        } catch (Exception e) {
             e.printStackTrace();
         }
-        mBeepResource = beepThemeSwitcher(beepTheme);
-        mTickResource = tickThemeSwitcher(tickTheme);
-
-        Log.d(getClass().getSimpleName(), "Sound theme: " + beepTheme);
-        Log.d(getClass().getSimpleName(), "isOverlapAllowed: " + isOverlapAllowed);
-        Log.d(getClass().getSimpleName(), "isVibrationAllowed: " + isVibrationAllowed);
-        Log.d(getClass().getSimpleName(), "tickCount: " + tickCount);
-        Log.d(getClass().getSimpleName(), "isMusicModeOn: " + isMusicModeOn);
+        mBeepResource = SoundIdSwitcher.beepThemeSwitcher(beepTheme);
+        mTickResource = SoundIdSwitcher.tickThemeSwitcher(tickTheme);
+        mBeepDuration = readDuration(mBeepResource);
     }
+
 
     private void initiateSoundPool() {
         mSoundPoolHelper = new MySoundPoolHelper(this);
         mSoundPoolHelper.initSoundPool();
     }
 
+
     private void initiateMusicData() {
-        mNoMusicText = (TextView) findViewById(R.id.no_music_text);
-        mNoMusicBackground = (ImageView) findViewById(R.id.no_music_background);
         if (isMusicModeOn) {
             initMusicViews();
             prepSongData(isConfigChanged);
@@ -278,29 +327,10 @@ public class HiitTimerActivity extends AppCompatActivity implements View.OnClick
     }
 
     private void initMusicViews() {
-        if (mNoMusicText != null) mNoMusicText.setVisibility(View.GONE);
-        if (mNoMusicBackground != null) mNoMusicBackground.setVisibility(View.GONE);
+        mMusicDrawerButton.setOnClickListener(this);
 
-        ImageView musicDrawerButton = (ImageView) findViewById(R.id.music_drawer_button);
-        if (musicDrawerButton != null) musicDrawerButton.setOnClickListener(this);
-        mDrawerLayout = (DrawerLayout) findViewById(R.id.music_drawer);
-        mDrawerList = (ListView) findViewById(R.id.hiit_timer_song_list);
-        if (themeMode == 3 || themeMode == 5) {
-            if (mDrawerList != null) mDrawerList.setBackgroundColor(Color.BLACK);
-        }
-
-        mSongName = (TextView) findViewById(R.id.hiit_timer_song_name);
-        mArtist = (TextView) findViewById(R.id.hiit_timer_artist);
-        mAlbumArt = (ImageView) findViewById(R.id.hiit_timer_album_art);
-        mPlayPauseIcon = (ImageView) findViewById(R.id.drawer_play_pause_icon);
-        mSkipNextIcon = (ImageView) findViewById(R.id.drawer_skip_next_icon);
-        mSkipPrevIcon = (ImageView) findViewById(R.id.drawer_skip_prev_icon);
-        mShuffleIcon = (ImageView) findViewById(R.id.drawer_shuffle_icon);
-        if (sharedPref.getBoolean(getString(R.string.shared_pref_shuffle_key), false)) {
-            mShuffleIcon.setImageResource(R.drawable.ic_action_playback_schuffle);
-        } else {
-            mShuffleIcon.setImageResource(R.drawable.ic_action_playback_repeat);
-        }
+        mShuffleIcon.setImageResource(SharedPrefHelper.isShuffleEnabled(this) ?
+                R.drawable.ic_action_playback_schuffle : R.drawable.ic_action_playback_repeat);
 
         mPlayPauseIcon.setOnClickListener(this);
         mSkipNextIcon.setOnClickListener(this);
@@ -324,9 +354,11 @@ public class HiitTimerActivity extends AppCompatActivity implements View.OnClick
                     if (musicBound) {
                         unbindService(musicConnection);
                         stopService(playIntent);
-                        if (mNoMusicBackground != null)mNoMusicBackground.setVisibility(View.VISIBLE);
-                        if (mNoMusicText != null)mNoMusicText.setVisibility(View.VISIBLE);
-                        if (mNoMusicText != null) mNoMusicText.setText(getResources().getString(R.string.hiit_timer_music_finished));
+                        if (mNoMusicBackground != null)
+                            mNoMusicBackground.setVisibility(View.VISIBLE);
+                        if (mNoMusicText != null) mNoMusicText.setVisibility(View.VISIBLE);
+                        if (mNoMusicText != null)
+                            mNoMusicText.setText(getResources().getString(R.string.hiit_timer_music_finished));
                         mDrawerList.setVisibility(View.GONE);
                         mPlayPauseIcon.setVisibility(View.GONE);
                         mSkipNextIcon.setVisibility(View.GONE);
@@ -373,12 +405,6 @@ public class HiitTimerActivity extends AppCompatActivity implements View.OnClick
     }
 
     public void initiateTimerData() {
-        mTimerMinsTextView = (TextView) findViewById(R.id.hiit_timer_mins_textView);
-        mTimerSecsTextView = (TextView) findViewById(R.id.hiit_timer_seconds_textView);
-        mTotalTextView = (TextView) findViewById(R.id.hiit_timer_total_textView);
-        mWorkoutTextView = (TextView) findViewById(R.id.hiit_timer_workout_textView);
-
-        mProgressBar = (ProgressBar) findViewById(R.id.hiit_timer_progressBar);
         if (mProgressBar != null) {
             mProgressBar.setOnClickListener(this);
         }
@@ -414,7 +440,6 @@ public class HiitTimerActivity extends AppCompatActivity implements View.OnClick
         v = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
 
         mTotalTextView.setText(TimerUtils.convertRawSecIntoString(total));
-        mRepsTextView = (TextView) findViewById(R.id.hiit_timer_reps_textView);
         if (mRepsTextView != null) {
             String currReps = "0 / " + reps;
             mRepsTextView.setText(currReps);
@@ -482,7 +507,7 @@ public class HiitTimerActivity extends AppCompatActivity implements View.OnClick
             animateProgressBar(duration);
             handleTimerUI(duration, action, reps, totalSecsToGo);
             launchNotification(duration, currentActionName, notifBuilder, notifManager, notificationId);
-            Log.d(TAG, "onNewRound: CurrentReps: "+currentReps);
+            Log.d(TAG, "onNewRound: CurrentReps: " + currentReps);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -506,7 +531,7 @@ public class HiitTimerActivity extends AppCompatActivity implements View.OnClick
 
     public void prepareSongUI(int position) {
         if (isMusicModeOn) {
-            Log.d(TAG, "prepareSongUI: "+ mSongList.get(position).getAlbumartUri());
+            Log.d(TAG, "prepareSongUI: " + mSongList.get(position).getAlbumartUri());
             mSongName.setText(mSongList.get(position).getmSongName());
             mArtist.setText(mSongList.get(position).getmArtist());
             Picasso.with(this)
@@ -555,7 +580,7 @@ public class HiitTimerActivity extends AppCompatActivity implements View.OnClick
                 }
                 logRealm.commitTransaction();
 
-                printUpdatedDatabase(logRealm);
+//                printUpdatedDatabase(logRealm);
                 if (!getIntent().hasExtra("TIMER_SET_POSITION")) {
                     HiitSingleton.getInstance().getTimers().remove(HiitSingleton.getInstance().getTimerListSize() - 1);
                 }
@@ -585,7 +610,7 @@ public class HiitTimerActivity extends AppCompatActivity implements View.OnClick
     private void configNotification(int seconds, int action) {
         notifManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
         launchNotification(seconds, actionSwitcher(action), createNotification(), notifManager, notificationId);
-        Log.d(TAG, "launchNotification: Notification id: "+notificationId);
+        Log.d(TAG, "launchNotification: Notification id: " + notificationId);
     }
 
     private NotificationCompat.Builder createNotification() {
@@ -615,40 +640,6 @@ public class HiitTimerActivity extends AppCompatActivity implements View.OnClick
         notifManager.cancel(notificationId);
     }
 
-    private void printUpdatedDatabase(Realm realm) {
-        RealmResults<WorkoutLog> workoutList = realm.where(WorkoutLog.class).findAll();
-        SimpleDateFormat simpleDateformat = new SimpleDateFormat("MMM dd, yyyy, EEE");
-        WorkoutLog currentWorkoutLog = null;
-        TimerLog currentTimerLog = null;
-        for (int i = 0; i < workoutList.size(); i++) {
-            currentWorkoutLog = workoutList.get(i);
-            Log.d("CURRENT_DATABASE", "DATE: " + simpleDateformat.format(workoutList.get(i).getmDate()));
-            for (int j = 0; j < workoutList.get(i).getTimerLogs().size(); j++) {
-                currentTimerLog = currentWorkoutLog.getTimerLogs().get(j);
-                Log.d("CURRENT_DATABASE", ", WARMUP: "
-                        + currentTimerLog.getWarmup() + ", WORK: "
-                        + currentTimerLog.getTotalWorkOrRestSeconds(currentTimerLog.getWorkSecs()) + ", RESTS: "
-                        + currentTimerLog.getTotalWorkOrRestSeconds(currentTimerLog.getRestSecs()) + ", REPS: "
-                        + currentTimerLog.getReps() + ", COOL DOWN: "
-                        + currentTimerLog.getCooldown() + ", TOTAL: "
-                        + currentTimerLog.getTotal() + ", "
-                        + currentTimerLog.getWorkoutNames() + ", ");
-
-            }
-        }
-
-        RealmResults<HiitTimerSet> timerSetList = realm.where(HiitTimerSet.class).findAll();
-        for (int i = 0; i < timerSetList.size(); i++) {
-            Log.d("SIMPLE_PRESETS", ", WARMUP: "
-                    + timerSetList.get(i).getWarmup() + ", WORK: "
-                    + timerSetList.get(i).getWork() + ", RESTS: "
-                    + timerSetList.get(i).getRest() + ", REPS: "
-                    + timerSetList.get(i).getReps() + ", COOL DOWN: "
-                    + timerSetList.get(i).getCooldown() + ", TOTAL: "
-                    + timerSetList.get(i).getTotal() + ", ");
-        }
-        realm.close();
-    }
 
     @Override
     public void onClick(View v) {
@@ -682,15 +673,10 @@ public class HiitTimerActivity extends AppCompatActivity implements View.OnClick
                 mPlayPauseIcon.setImageResource(R.drawable.ic_pause);
                 break;
             case R.id.drawer_shuffle_icon:
-                if (musicService.shuffleOn()) {
-                    mShuffleIcon.setImageResource(R.drawable.ic_action_playback_schuffle);
-                    Toast.makeText(HiitTimerActivity.this, "Shuffle on", Toast.LENGTH_SHORT).show();
-                    saveShuffleIntoSharedPref(true);
-                } else {
-                    mShuffleIcon.setImageResource(R.drawable.ic_action_playback_repeat);
-                    Toast.makeText(HiitTimerActivity.this, "Shuffle off", Toast.LENGTH_SHORT).show();
-                    saveShuffleIntoSharedPref(false);
-                }
+                    mShuffleIcon.setImageResource(musicService.shuffleOn() ?
+                            R.drawable.ic_action_playback_schuffle : R.drawable.ic_action_playback_repeat);
+                    SharedPrefHelper.setShuffle(this, musicService.shuffleOn());
+
                 break;
             case R.id.music_drawer_button:
                 mDrawerLayout.openDrawer(Gravity.LEFT);
@@ -699,13 +685,6 @@ public class HiitTimerActivity extends AppCompatActivity implements View.OnClick
         }
     }
 
-    private void saveShuffleIntoSharedPref(boolean isShuffleOn) {
-        sharedPref = getSharedPreferences(getString(R.string.shared_pref_open_key), Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPref.edit();
-        editor.putBoolean(getString(R.string.shared_pref_shuffle_key), isShuffleOn);
-//        Log.d(getClass().getSimpleName(), sharedPref.getBoolean(MainActivity.sharedPrefShuffleKey, false) + "");
-        editor.apply();
-    }
 
     public void animateProgressBar(int time) {
         long fromTo = (long) time;
@@ -731,7 +710,7 @@ public class HiitTimerActivity extends AppCompatActivity implements View.OnClick
 
     private void handleTimerUI(int duration, int action, int currentReps, int remainingTotal) {
         mWorkoutTextView.setText(actionSwitcher(action));
-        Log.d(TAG, "handleTimerUI: "+actionSwitcher(action));
+        Log.d(TAG, "handleTimerUI: " + actionSwitcher(action));
         if (action == TimerFragment.ACTION_WORK) mRepsTextView.setText(currentReps + " / " + reps);
         handleTimerUI(duration, remainingTotal);
     }
@@ -852,7 +831,7 @@ public class HiitTimerActivity extends AppCompatActivity implements View.OnClick
         outState.putInt(ROUND_DURATION_BEFORE_CONFIG_CHANGE, duration);
         outState.putBoolean(IS_TIMER_PAUSED_BEFORE_CONFIG_CHANGE, isTimerStopped);
         outState.putBoolean(IS_TIMER_ACTIVE_BEFORE_CONFIG_CHANGE, isTimerActive);
-        Log.d(TAG, "onSaveInstanceState: Writing value "+currentSeconds + ", Total " + totalSecsToGo + " seconds left");
+        Log.d(TAG, "onSaveInstanceState: Writing value " + currentSeconds + ", Total " + totalSecsToGo + " seconds left");
         super.onSaveInstanceState(outState);
     }
 
@@ -863,68 +842,12 @@ public class HiitTimerActivity extends AppCompatActivity implements View.OnClick
         }
     }
 
-    public int beepThemeSwitcher(int beepTheme) {
-        switch (beepTheme) {
-            case 1:
-                readDuration(R.raw.beep_basic_beep);
-                return R.raw.beep_basic_beep;
-            case 2:
-                readDuration(R.raw.beep_whistle);
-                return R.raw.beep_whistle;
-            case 3:
-                readDuration(R.raw.beep_machine_gun);
-                return R.raw.beep_machine_gun;
-            case 4:
-                readDuration(R.raw.beep_rifle_shot);
-                return R.raw.beep_rifle_shot;
-            case 5:
-                readDuration(R.raw.beep_chime_bell);
-                return R.raw.beep_chime_bell;
-            case 6:
-                readDuration(R.raw.beep_click);
-                return R.raw.beep_click;
-            case 7:
-                readDuration(R.raw.beep_glass_click);
-                return R.raw.beep_glass_click;
-            case 8:
-                readDuration(R.raw.beep_home_run);
-                return R.raw.beep_home_run;
-            case 9:
-                readDuration(R.raw.beep_xylophone_beep);
-                return R.raw.beep_xylophone_beep;
-            default:
-                readDuration(R.raw.beep_basic_beep);
-                return R.raw.beep_basic_beep;
-        }
-    }
-
-    public int tickThemeSwitcher(int tickTheme) {
-        switch (tickTheme) {
-            case 1:
-                return R.raw.tick_basic_tick;
-            case 2:
-                return R.raw.tick_camera_click;
-            case 3:
-                return R.raw.tick_hint;
-            case 4:
-                return R.raw.tick_pistol;
-            case 5:
-                return R.raw.tick_shotgun_pump;
-            case 6:
-                return R.raw.tick_temple_block_hit;
-            case 7:
-                return R.raw.tick_xylophone_tick;
-            default:
-                return R.raw.beep_basic_beep;
-        }
-    }
-
-    private void readDuration(int resource) {
-        Uri mediaPath =  Uri.parse("android.resource://" + getPackageName() + "/" + resource);
+    private long readDuration(int resource) {
+        Uri mediaPath = Uri.parse("android.resource://" + getPackageName() + "/" + resource);
         MediaMetadataRetriever mmr = new MediaMetadataRetriever();
         mmr.setDataSource(this, mediaPath);
         String duration = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION);
-        mBeepDuration = Long.parseLong(duration);
+        return Long.parseLong(duration);
     }
 
 }

@@ -6,4 +6,5 @@
     <attr name="rightArrowDrawable" format="reference" />
     <attr name="leftArrowDrawable" format="reference" />
     <attr name="advancedSettingDrawable" format="reference" />
+    <attr name="musicDrawerBackground" format="reference" />
 </resources>
