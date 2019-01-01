@@ -29,44 +29,6 @@
         android:orientation="vertical">
 
         <LinearLayout
-            android:id="@+id/music_desc_ll"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="20dp"
-            android:padding="16dp"
-            android:gravity="center_vertical">
-
-            <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:src="@drawable/icon_music" />
-
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:gravity="center_vertical"
-                android:orientation="vertical"
-                android:paddingLeft="16dp">
-
-                <TextView
-                    android:id="@+id/music_title_tv"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:maxLines="1"
-                    android:text="@string/go_premium_feature_music_title"
-                    android:textSize="20sp" />
-
-                <TextView
-                    android:id="@+id/music_desc_tv"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/go_premium_feature_music_desc" />
-
-            </LinearLayout>
-
-        </LinearLayout>
-
-        <LinearLayout
             android:id="@+id/preset_desc_ll"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

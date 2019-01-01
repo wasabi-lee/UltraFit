@@ -2,6 +2,7 @@ package com.inceptedapps.wasabi.ultimateworkouttimerforhiit.util;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 
 import com.inceptedapps.wasabi.ultimateworkouttimerforhiit.R;
 
@@ -93,38 +94,38 @@ public class SharedPrefHelper {
 
 
     private static void setDefaultSharedPreferenceString(Context context, String key, String value) {
-        SharedPreferences settings = context.getSharedPreferences(PREF_FILE, Context.MODE_PRIVATE);
+        SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(context);
         SharedPreferences.Editor editor = settings.edit();
         editor.putString(key, value);
         editor.apply();
     }
 
     private static void setDefaultSharedPreferenceInt(Context context, String key, int value) {
-        SharedPreferences settings = context.getSharedPreferences(PREF_FILE, Context.MODE_PRIVATE);
+        SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(context);
         SharedPreferences.Editor editor = settings.edit();
         editor.putInt(key, value);
         editor.apply();
     }
 
     private static void setDefaultSharedPreferenceBoolean(Context context, String key, boolean value) {
-        SharedPreferences settings = context.getSharedPreferences(PREF_FILE, Context.MODE_PRIVATE);
+        SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(context);
         SharedPreferences.Editor editor = settings.edit();
         editor.putBoolean(key, value);
         editor.apply();
     }
 
     private static String getDefaultSharedPreferenceString(Context context, String key, String defValue) {
-        SharedPreferences settings = context.getSharedPreferences(PREF_FILE, Context.MODE_PRIVATE);
+        SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(context);
         return settings.getString(key, defValue);
     }
 
     private static int getDefaultSharedPreferenceInt(Context context, String key, int defValue) {
-        SharedPreferences settings = context.getSharedPreferences(PREF_FILE, Context.MODE_PRIVATE);
+        SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(context);
         return settings.getInt(key, defValue);
     }
 
     private static boolean getDefaultSharedPreferenceBoolean(Context context, String key, boolean defValue) {
-        SharedPreferences settings = context.getSharedPreferences(PREF_FILE, Context.MODE_PRIVATE);
+        SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(context);
         return settings.getBoolean(key, defValue);
     }
 

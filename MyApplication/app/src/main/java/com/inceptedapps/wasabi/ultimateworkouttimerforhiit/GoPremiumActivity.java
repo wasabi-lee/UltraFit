@@ -42,8 +42,6 @@ public class GoPremiumActivity extends AppCompatActivity {
         sharedPref = GoPremiumActivity.this.getSharedPreferences(getString(R.string.shared_pref_open_key), Context.MODE_PRIVATE);
         button = (Button) findViewById(R.id.go_premium_button);
 
-        TextView mMusicTitle = (TextView) findViewById(R.id.music_title_tv);
-        TextView mMusicDesc = (TextView) findViewById(R.id.music_desc_tv);
         TextView mPresetTitle = (TextView) findViewById(R.id.presets_title_tv);
         TextView mPresetDesc = (TextView) findViewById(R.id.presets_desc_tv);
         TextView mAdFreeTitle = (TextView) findViewById(R.id.ad_free_title_tv);
@@ -51,8 +49,6 @@ public class GoPremiumActivity extends AppCompatActivity {
 
         int theme = Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(this).getString(getResources().getString(R.string.SHARED_PREF_COLOR_THEME_KEY), "1"));
         if (theme == 3 || theme == 5) {
-            mMusicTitle.setTextColor(Color.WHITE);
-            mMusicDesc.setTextColor(Color.WHITE);
             mPresetTitle.setTextColor(Color.WHITE);
             mPresetDesc.setTextColor(Color.WHITE);
             mAdFreeTitle.setTextColor(Color.WHITE);

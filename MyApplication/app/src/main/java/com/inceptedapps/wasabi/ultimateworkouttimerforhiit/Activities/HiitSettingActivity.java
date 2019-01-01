@@ -37,6 +37,7 @@ import com.inceptedapps.wasabi.ultimateworkouttimerforhiit.custom.ThemeUtils;
 import com.inceptedapps.wasabi.ultimateworkouttimerforhiit.custom.TimerUtils;
 import com.inceptedapps.wasabi.ultimateworkouttimerforhiit.R;
 import com.inceptedapps.wasabi.ultimateworkouttimerforhiit.util.RoundHelper;
+import com.inceptedapps.wasabi.ultimateworkouttimerforhiit.util.SharedPrefHelper;
 
 import java.util.concurrent.TimeUnit;
 
@@ -114,8 +115,7 @@ public class HiitSettingActivity extends AppCompatActivity implements View.OnCli
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        ThemeUtils.changeToTheme(Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(this)
-                .getString(getResources().getString(R.string.SHARED_PREF_COLOR_THEME_KEY), "1")));
+        ThemeUtils.changeToTheme(Integer.parseInt(SharedPrefHelper.getThemeId(this)));
         setTheme(ThemeUtils.themeSwitcher());
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_hiit_setting);

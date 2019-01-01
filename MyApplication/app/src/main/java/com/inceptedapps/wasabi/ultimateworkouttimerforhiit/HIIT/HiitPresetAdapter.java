@@ -94,7 +94,7 @@ public class HiitPresetAdapter extends RecyclerView.Adapter<HiitPresetAdapter.Vi
             @Override
             public void onClick(View v) {
                 mRealm.beginTransaction();
-                mPresets.remove(holder.getAdapterPosition());
+                mPresets.get(holder.getAdapterPosition()).deleteFromRealm();
                 mRealm.commitTransaction();
                 notifyItemRemoved(holder.getAdapterPosition());
                 notifyDataSetChanged();

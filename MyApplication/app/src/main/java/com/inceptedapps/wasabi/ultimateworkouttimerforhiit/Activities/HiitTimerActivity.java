@@ -5,45 +5,38 @@ import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
-import android.content.SharedPreferences;
 import android.graphics.BitmapFactory;
-import android.graphics.Color;
 import android.media.MediaMetadataRetriever;
 import android.media.MediaPlayer;
 import android.net.Uri;
-import android.os.Build;
 import android.os.IBinder;
 import android.os.Vibrator;
-import android.preference.PreferenceManager;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
-import android.view.ViewTreeObserver;
 import android.view.WindowManager;
 import android.view.animation.LinearInterpolator;
-import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
+import com.inceptedapps.wasabi.ultimateworkouttimerforhiit.fragments.ExitTimerDialogFragment;
 import com.inceptedapps.wasabi.ultimateworkouttimerforhiit.fragments.TimerFragment;
 import com.inceptedapps.wasabi.ultimateworkouttimerforhiit.hiit.HiitSingleton;
 import com.inceptedapps.wasabi.ultimateworkouttimerforhiit.hiit.HiitTimerSet;
+import com.inceptedapps.wasabi.ultimateworkouttimerforhiit.hiit.TimerSession;
 import com.inceptedapps.wasabi.ultimateworkouttimerforhiit.music.MusicDrawerListAdapter;
 import com.inceptedapps.wasabi.ultimateworkouttimerforhiit.music.Song;
 import com.inceptedapps.wasabi.ultimateworkouttimerforhiit.music.SongSingleton;
@@ -57,6 +50,7 @@ import com.inceptedapps.wasabi.ultimateworkouttimerforhiit.progress.WorkoutLog;
 import com.inceptedapps.wasabi.ultimateworkouttimerforhiit.R;
 import com.inceptedapps.wasabi.ultimateworkouttimerforhiit.service.KillNotificationsService;
 import com.inceptedapps.wasabi.ultimateworkouttimerforhiit.service.MusicService;
+import com.inceptedapps.wasabi.ultimateworkouttimerforhiit.util.RoundHelper;
 import com.inceptedapps.wasabi.ultimateworkouttimerforhiit.util.SharedPrefHelper;
 import com.inceptedapps.wasabi.ultimateworkouttimerforhiit.util.SoundIdSwitcher;
 import com.squareup.picasso.Picasso;
@@ -68,16 +62,18 @@ import java.util.Date;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import io.realm.Realm;
 import io.realm.RealmList;
 import io.realm.RealmResults;
 
-public class HiitTimerActivity extends AppCompatActivity implements View.OnClickListener, MediaPlayer.OnCompletionListener, TimerFragment.TimerOnTickListener {
+public class HiitTimerActivity extends AppCompatActivity implements MediaPlayer.OnCompletionListener, TimerFragment.TimerOnTickListener {
 
     //Declaring Views and the timer set object
 
     private static final String TAG = HiitTimerActivity.class.getSimpleName();
     private static final String NOTIFICATION_ID_KEY = "notif_id_key";
+    private static final String EXIT_TIMER_DIALOG_TAG = "exit_timer_dialog_tag";
 
     @BindView(R.id.music_drawer)
     DrawerLayout mDrawerLayout;
@@ -137,13 +133,12 @@ public class HiitTimerActivity extends AppCompatActivity implements View.OnClick
     ListView mDrawerList;
 
     private boolean isMusicModeOn, isTimerActive = true, isTimerStopped;
-    private MusicDrawerListAdapter mAdapter;
     private ArrayList<Song> mSongList;
     private boolean isConfigChanged = false;
 
     private MusicService musicService;
     private Intent playIntent;
-    private boolean musicBound = false, isMusicFinished = false;
+    private boolean musicBound = false;
     private BroadcastReceiver broadcastReceiver;
     private int songPosition;
     private long mBeepDuration = 1000;
@@ -191,7 +186,6 @@ public class HiitTimerActivity extends AppCompatActivity implements View.OnClick
     MyAnimation anim;
     Vibrator v;
 
-    private SharedPreferences sharedPref;
     private MySoundPoolHelper mSoundPoolHelper;
 
     private Realm logRealm;
@@ -203,7 +197,7 @@ public class HiitTimerActivity extends AppCompatActivity implements View.OnClick
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        ThemeUtils.changeToTheme(Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(this).getString(getResources().getString(R.string.SHARED_PREF_COLOR_THEME_KEY), "1")));
+        ThemeUtils.changeToTheme(Integer.parseInt(SharedPrefHelper.getThemeId(this)));
         setTheme(ThemeUtils.themeSwitcher());
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_hiit_timer);
@@ -211,52 +205,57 @@ public class HiitTimerActivity extends AppCompatActivity implements View.OnClick
         ButterKnife.bind(this);
 
 
-        isPremium = SharedPrefHelper.isPremium(this);
+        retrieveSharedPrefValues();
 
+        v = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
 
         initializeAds();
-        retrieveSharedPrefValues();
         instantiateRealm();
         initiateSoundPool();
         initiateMusicData();
-        initiateTimerData();
+        initTimerData();
         initFragment();
         configAnim();
 
         if (savedInstanceState != null) {
-
-            isConfigChanged = true;
-
-            currentSeconds = savedInstanceState.getInt(TIME_BEFORE_CONFIG_CHANGE);
-            totalSecsToGo = savedInstanceState.getInt(TOTAL_BEFORE_CONFIG_CHANGE);
-            action = savedInstanceState.getInt(ACTION_BEFORE_CONFIG_CHANGE);
-            duration = savedInstanceState.getInt(ROUND_DURATION_BEFORE_CONFIG_CHANGE);
-            currentReps = savedInstanceState.getInt(CURRENT_REPS_BEFORE_CONFIG_CHANGE);
-            isTimerActive = savedInstanceState.getBoolean(IS_TIMER_ACTIVE_BEFORE_CONFIG_CHANGE);
-            isTimerStopped = savedInstanceState.getBoolean(IS_TIMER_PAUSED_BEFORE_CONFIG_CHANGE);
-
-            Log.d(TAG, "onCreate: Remaining time: " + currentSeconds +
-                    ", isTimerActive: " + isTimerActive +
-                    ", isTimerStopped: " + isTimerStopped +
-                    ", Duration: " + duration +
-                    ", reps: " + reps +
-                    ", action: " + action +
-                    ", total: " + totalSecsToGo);
-
-            mProgressBar.setMax(duration * 100);
-            mProgressBar.setProgress(currentSeconds);
-            if (!isTimerStopped) animateProgressBar(currentSeconds);
-            handleTimerUI(currentSeconds, action, reps, totalSecsToGo);
-            configNotification(currentSeconds, action);
+            restoreSavedState(savedInstanceState);
         } else {
             configNotification(warmup, TimerFragment.ACTION_WARMUP);
         }
     }
 
+
+    private void restoreSavedState(Bundle savedState) {
+        isConfigChanged = true;
+
+        currentSeconds = savedState.getInt(TIME_BEFORE_CONFIG_CHANGE);
+        totalSecsToGo = savedState.getInt(TOTAL_BEFORE_CONFIG_CHANGE);
+        action = savedState.getInt(ACTION_BEFORE_CONFIG_CHANGE);
+        duration = savedState.getInt(ROUND_DURATION_BEFORE_CONFIG_CHANGE);
+        currentReps = savedState.getInt(CURRENT_REPS_BEFORE_CONFIG_CHANGE);
+        isTimerActive = savedState.getBoolean(IS_TIMER_ACTIVE_BEFORE_CONFIG_CHANGE);
+        isTimerStopped = savedState.getBoolean(IS_TIMER_PAUSED_BEFORE_CONFIG_CHANGE);
+
+        Log.d(TAG, "onCreate: Remaining time: " + currentSeconds +
+                ", isTimerActive: " + isTimerActive +
+                ", isTimerStopped: " + isTimerStopped +
+                ", Duration: " + duration +
+                ", reps: " + reps +
+                ", action: " + action +
+                ", total: " + totalSecsToGo);
+
+        mProgressBar.setMax(duration * 100);
+        mProgressBar.setProgress(currentSeconds);
+        if (!isTimerStopped) animateProgressBar(currentSeconds);
+        handleTimerUI(currentSeconds, action, reps, totalSecsToGo);
+        configNotification(currentSeconds, action);
+    }
+
+
     private ServiceConnection musicConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
-            if (mSongList.size() != 0) {
+            if (isMusicModeOn) {
                 MusicService.MusicBinder binder = (MusicService.MusicBinder) service;
                 musicService = binder.getService();
                 musicBound = true;
@@ -270,9 +269,11 @@ public class HiitTimerActivity extends AppCompatActivity implements View.OnClick
         }
     };
 
+
     private void instantiateRealm() {
         logRealm = Realm.getDefaultInstance();
     }
+
 
     private void initializeAds() {
         if (mAdView != null) {
@@ -287,8 +288,9 @@ public class HiitTimerActivity extends AppCompatActivity implements View.OnClick
         }
     }
 
-    private void retrieveSharedPrefValues() {
 
+    private void retrieveSharedPrefValues() {
+        isPremium = SharedPrefHelper.isPremium(this);
         isOverlapAllowed = SharedPrefHelper.shouldMusicOverlapCue(this);
         isVibrationAllowed = SharedPrefHelper.isVibrationEnabled(this);
         tickCount = Integer.parseInt(SharedPrefHelper.getTickCounts(this));
@@ -326,16 +328,11 @@ public class HiitTimerActivity extends AppCompatActivity implements View.OnClick
         }
     }
 
-    private void initMusicViews() {
-        mMusicDrawerButton.setOnClickListener(this);
 
+    private void initMusicViews() {
         mShuffleIcon.setImageResource(SharedPrefHelper.isShuffleEnabled(this) ?
                 R.drawable.ic_action_playback_schuffle : R.drawable.ic_action_playback_repeat);
 
-        mPlayPauseIcon.setOnClickListener(this);
-        mSkipNextIcon.setOnClickListener(this);
-        mSkipPrevIcon.setOnClickListener(this);
-        mShuffleIcon.setOnClickListener(this);
 
         broadcastReceiver = new BroadcastReceiver() {
             @Override
@@ -344,107 +341,58 @@ public class HiitTimerActivity extends AppCompatActivity implements View.OnClick
                     //Change song album art
                     songPosition = intent.getIntExtra(MusicService.UI_CHANGE_MESSAGE, -1);
                     prepareSongUI(songPosition);
-                    Log.d(getClass().getSimpleName(), "Service tracker: On Receive: Song Position: " + songPosition);
-
-                } else if (intent.hasExtra(MusicService.MUSIC_FINISHED_MESSAGE)) {
-                    //10 MINUTE FREE PLAYBACK IS DONE
-                    Log.d(getClass().getSimpleName(), "Free music playback is finished");
-                    isMusicFinished = true;
-
-                    if (musicBound) {
-                        unbindService(musicConnection);
-                        stopService(playIntent);
-                        if (mNoMusicBackground != null)
-                            mNoMusicBackground.setVisibility(View.VISIBLE);
-                        if (mNoMusicText != null) mNoMusicText.setVisibility(View.VISIBLE);
-                        if (mNoMusicText != null)
-                            mNoMusicText.setText(getResources().getString(R.string.hiit_timer_music_finished));
-                        mDrawerList.setVisibility(View.GONE);
-                        mPlayPauseIcon.setVisibility(View.GONE);
-                        mSkipNextIcon.setVisibility(View.GONE);
-                        mSkipPrevIcon.setVisibility(View.GONE);
-                        mShuffleIcon.setVisibility(View.GONE);
-                    }
-                    LocalBroadcastManager.getInstance(HiitTimerActivity.this).unregisterReceiver(broadcastReceiver);
                 }
             }
         };
 
-        ViewTreeObserver vto = mAlbumArt.getViewTreeObserver();
-        vto.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
-            @Override
-            public void onGlobalLayout() {
-                prepareSongUI(songPosition);
-                ViewTreeObserver obs = mAlbumArt.getViewTreeObserver();
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-                    obs.removeOnGlobalLayoutListener(this);
-                } else {
-                    obs.removeGlobalOnLayoutListener(this);
-                }
-            }
-        });
+        prepareSongUI(songPosition);
     }
+
 
     private void prepSongData(boolean isConfigChanged) {
-        if (!isConfigChanged) SongSingleton.getInstance().prepareAlbumArt();
+
+        if (!isConfigChanged)
+            SongSingleton.getInstance().prepareAlbumArt();
+
         mSongList = new ArrayList<>();
         mSongList.addAll(SongSingleton.getInstance().getSelectedSongs());
-        mAdapter = new MusicDrawerListAdapter(this, mSongList);
+        MusicDrawerListAdapter mAdapter = new MusicDrawerListAdapter(this, mSongList);
         mDrawerList.setAdapter(mAdapter);
-        mDrawerList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                if (musicService != null) {
-                    prepareSongUI(position);
-                    musicService.setSong(position);
-                    musicService.playSong();
-                }
+        mDrawerList.setOnItemClickListener((parent, view, position, id) -> {
+            if (musicService != null) {
+                prepareSongUI(position);
+                musicService.setSong(position);
+                musicService.playSong();
             }
         });
-
     }
 
-    public void initiateTimerData() {
-        if (mProgressBar != null) {
-            mProgressBar.setOnClickListener(this);
-        }
 
-        if (themeMode == 3 || themeMode == 5) {
-            mWorkoutTextView.setTextColor(Color.WHITE);
-        }
+    public void initTimerData() {
+
         workoutTvSize = mWorkoutTextView.getTextSize();
 
         HiitSingleton hiitSingleton = HiitSingleton.getInstance();
-        if (!getIntent().hasExtra("TIMER_SET_POSITION")) {
-            hiitTimerSet = hiitSingleton.getTimers().get((hiitSingleton.getTimers().size() - 1));
-        } else {
-            hiitTimerSet = hiitSingleton.getTimers().get(getIntent().getIntExtra("TIMER_SET_POSITION", -1));
-        }
+        int timerSetPosition = getIntent().getIntExtra("TIMER_SET_POSITION", -1);
+        hiitTimerSet = hiitSingleton.getTimers().get(timerSetPosition != -1 ?
+                timerSetPosition : hiitSingleton.getTimers().size() - 1);
+
         warmup = hiitTimerSet.getWarmup();
         reps = hiitTimerSet.getReps();
         cooldown = hiitTimerSet.getCooldown();
         total = hiitTimerSet.getTotal();
         totalSecsToGo = total;
 
-        workoutNames = hiitTimerSet.getWorkoutNames().split("=");
-        String[] stringWorkSeconds = hiitTimerSet.getWorkSeconds().split("=");
-        String[] stringRestSeconds = hiitTimerSet.getRestSeconds().split("=");
-        workSeconds = new int[reps];
-        restSeconds = new int[reps];
-        for (int i = 0; i < reps; i++) {
-            workSeconds[i] = Integer.parseInt(stringWorkSeconds[i]);
-            restSeconds[i] = Integer.parseInt(stringRestSeconds[i]);
-        }
-
-
-        v = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+        workoutNames = RoundHelper.getWorkoutNameArr(hiitTimerSet);
+        workSeconds = RoundHelper.getTimeArr(hiitTimerSet, TimerSession.WORK);
+        restSeconds = RoundHelper.getTimeArr(hiitTimerSet, TimerSession.REST);
 
         mTotalTextView.setText(TimerUtils.convertRawSecIntoString(total));
-        if (mRepsTextView != null) {
-            String currReps = "0 / " + reps;
-            mRepsTextView.setText(currReps);
-        }
+        String currReps = "0 / " + reps;
+        mRepsTextView.setText(currReps);
+
     }
+
 
     private void initFragment() {
         FragmentManager fm = getSupportFragmentManager();
@@ -463,10 +411,12 @@ public class HiitTimerActivity extends AppCompatActivity implements View.OnClick
         }
     }
 
+
     private void configAnim() {
         anim = new MyAnimation(mProgressBar, total * 100, 0);
         anim.setInterpolator(new LinearInterpolator());
     }
+
 
     @Override
     public void onTick(int remainingSeconds) {
@@ -491,6 +441,7 @@ public class HiitTimerActivity extends AppCompatActivity implements View.OnClick
         }
     }
 
+
     @Override
     public void onNewRound(int duration, int action, int reps) {
         try {
@@ -513,6 +464,7 @@ public class HiitTimerActivity extends AppCompatActivity implements View.OnClick
         }
     }
 
+
     @Override
     public void onTimerFinished() {
         try {
@@ -529,9 +481,9 @@ public class HiitTimerActivity extends AppCompatActivity implements View.OnClick
         }
     }
 
+
     public void prepareSongUI(int position) {
-        if (isMusicModeOn) {
-            Log.d(TAG, "prepareSongUI: " + mSongList.get(position).getAlbumartUri());
+        if (isMusicModeOn && position != -1) {
             mSongName.setText(mSongList.get(position).getmSongName());
             mArtist.setText(mSongList.get(position).getmArtist());
             Picasso.with(this)
@@ -540,8 +492,8 @@ public class HiitTimerActivity extends AppCompatActivity implements View.OnClick
         }
     }
 
+
     private void writeThisSessionIntoDB() {
-        Log.d("MILLIS_Complete", "complete");
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -562,7 +514,6 @@ public class HiitTimerActivity extends AppCompatActivity implements View.OnClick
                     todaysStringDate = simpleDateFormat.format(todaysDate);
                     lastStringWorkoutDate = simpleDateFormat.format(lastWorkoutLog.getmDate());
                 }
-                simpleDateFormat = null;
 
                 logRealm.beginTransaction();
                 if (!todaysStringDate.equals(lastStringWorkoutDate)) {
@@ -593,6 +544,7 @@ public class HiitTimerActivity extends AppCompatActivity implements View.OnClick
         mSoundPoolHelper.onFireRequested(mTickResource, MySoundPoolHelper.FLAG_TICK_SOUND);
     }
 
+
     private void fireBeep() {
         if (!isFinishing()) {
             if (isVibrationAllowed) {
@@ -607,11 +559,13 @@ public class HiitTimerActivity extends AppCompatActivity implements View.OnClick
         }
     }
 
+
     private void configNotification(int seconds, int action) {
         notifManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
         launchNotification(seconds, actionSwitcher(action), createNotification(), notifManager, notificationId);
         Log.d(TAG, "launchNotification: Notification id: " + notificationId);
     }
+
 
     private NotificationCompat.Builder createNotification() {
         notifBuilder = new NotificationCompat.Builder(HiitTimerActivity.this);
@@ -636,53 +590,60 @@ public class HiitTimerActivity extends AppCompatActivity implements View.OnClick
         manager.notify(id, builder.build());
     }
 
+
     private void closeNotification() {
         notifManager.cancel(notificationId);
     }
 
 
-    @Override
-    public void onClick(View v) {
-        switch (v.getId()) {
-            case R.id.hiit_timer_progressBar:
-                if (isTimerActive) {
-                    if (!isTimerStopped) {
-                        timerFragment.pauseTimer();
-                        anim.pause();
-                        isTimerStopped = true;
-                    } else {
-                        timerFragment.resumeTimer();
-                        anim.resume();
-                        isTimerStopped = false;
-                    }
-                }
-                break;
-            case R.id.drawer_play_pause_icon:
-                if (musicService.pauseSong()) {
-                    mPlayPauseIcon.setImageResource(R.drawable.ic_play_arrow);
-                } else {
-                    mPlayPauseIcon.setImageResource(R.drawable.ic_pause);
-                }
-                break;
-            case R.id.drawer_skip_next_icon:
-                musicService.skipSong(true);
-                mPlayPauseIcon.setImageResource(R.drawable.ic_pause);
-                break;
-            case R.id.drawer_skip_prev_icon:
-                musicService.skipSong(false);
-                mPlayPauseIcon.setImageResource(R.drawable.ic_pause);
-                break;
-            case R.id.drawer_shuffle_icon:
-                    mShuffleIcon.setImageResource(musicService.shuffleOn() ?
-                            R.drawable.ic_action_playback_schuffle : R.drawable.ic_action_playback_repeat);
-                    SharedPrefHelper.setShuffle(this, musicService.shuffleOn());
-
-                break;
-            case R.id.music_drawer_button:
-                mDrawerLayout.openDrawer(Gravity.LEFT);
-            default:
-                break;
+    @OnClick(R.id.hiit_timer_progressBar)
+    public void resumePauseTimer() {
+        if (isTimerActive) {
+            if (!isTimerStopped) {
+                timerFragment.pauseTimer();
+                anim.pause();
+                isTimerStopped = true;
+            } else {
+                timerFragment.resumeTimer();
+                anim.resume();
+                isTimerStopped = false;
+            }
         }
+    }
+
+
+    @OnClick(R.id.drawer_play_pause_icon)
+    public void resumePauseSong() {
+        mPlayPauseIcon.setImageResource(musicService.pauseSong() ?
+                R.drawable.ic_play_arrow : R.drawable.ic_pause);
+    }
+
+
+    @OnClick(R.id.drawer_skip_next_icon)
+    public void skipNextSong() {
+        musicService.skipSong(true);
+        mPlayPauseIcon.setImageResource(R.drawable.ic_pause);
+    }
+
+
+    @OnClick(R.id.drawer_skip_prev_icon)
+    public void skipPrevSong() {
+        musicService.skipSong(false);
+        mPlayPauseIcon.setImageResource(R.drawable.ic_pause);
+    }
+
+
+    @OnClick(R.id.drawer_shuffle_icon)
+    public void shufflePlayer() {
+        mShuffleIcon.setImageResource(musicService.shuffleOn() ?
+                R.drawable.ic_action_playback_schuffle : R.drawable.ic_action_playback_repeat);
+        SharedPrefHelper.setShuffle(this, musicService.shuffleOn());
+    }
+
+
+    @OnClick(R.id.music_drawer_button)
+    public void openHideDrawer() {
+        mDrawerLayout.openDrawer(Gravity.LEFT);
     }
 
 
@@ -693,6 +654,7 @@ public class HiitTimerActivity extends AppCompatActivity implements View.OnClick
         anim.setTo(0);
         mProgressBar.startAnimation(anim);
     }
+
 
     private String actionSwitcher(int action) {
         switch (action) {
@@ -708,12 +670,14 @@ public class HiitTimerActivity extends AppCompatActivity implements View.OnClick
         return "WORK";
     }
 
+
     private void handleTimerUI(int duration, int action, int currentReps, int remainingTotal) {
         mWorkoutTextView.setText(actionSwitcher(action));
         Log.d(TAG, "handleTimerUI: " + actionSwitcher(action));
         if (action == TimerFragment.ACTION_WORK) mRepsTextView.setText(currentReps + " / " + reps);
         handleTimerUI(duration, remainingTotal);
     }
+
 
     private void handleTimerUI(int currentSeconds, int remainingTotal) {
         String[] minSec = TimerUtils.convertRawSecIntoStringArr(currentSeconds);
@@ -722,6 +686,7 @@ public class HiitTimerActivity extends AppCompatActivity implements View.OnClick
         mTotalTextView.setText(TimerUtils.convertRawSecIntoString(remainingTotal));
     }
 
+
     private void handleFinishedTimerUI() {
         mWorkoutTextView.setText("COMPLETE");
         mTimerMinsTextView.setText("00");
@@ -729,31 +694,24 @@ public class HiitTimerActivity extends AppCompatActivity implements View.OnClick
         mTotalTextView.setText("00:00");
     }
 
+
     @Override
     public void onBackPressed() {
         if (isTimerActive) {
-            AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            builder.setTitle("Do you want to exit?");
-            builder.setMessage("The timer will be canceled");
-            builder.setPositiveButton("YES", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    Intent returningIntent = new Intent();
-                    setResult(RESULT_OK, returningIntent);
-                    finish();
-                }
-            });
-            builder.setNegativeButton("NO", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    dialog.dismiss();
-                }
-            });
-            builder.create().show();
+            ExitTimerDialogFragment dialog = new ExitTimerDialogFragment();
+            dialog.show(getSupportFragmentManager(), EXIT_TIMER_DIALOG_TAG);
         } else {
             finish();
         }
     }
+
+
+    public void finishActivity() {
+        Intent returningIntent = new Intent();
+        setResult(RESULT_OK, returningIntent);
+        finish();
+    }
+
 
     @Override
     protected void onStart() {
@@ -768,6 +726,7 @@ public class HiitTimerActivity extends AppCompatActivity implements View.OnClick
         }
     }
 
+
     @Override
     protected void onResume() {
         Log.d(TAG, "onResume: ");
@@ -780,6 +739,7 @@ public class HiitTimerActivity extends AppCompatActivity implements View.OnClick
         super.onResume();
     }
 
+
     @Override
     protected void onPause() {
         try {
@@ -789,6 +749,7 @@ public class HiitTimerActivity extends AppCompatActivity implements View.OnClick
         }
         super.onPause();
     }
+
 
     @Override
     protected void onStop() {
@@ -801,14 +762,13 @@ public class HiitTimerActivity extends AppCompatActivity implements View.OnClick
         super.onStop();
     }
 
+
     @Override
     protected void onDestroy() {
         // 1. Music mode is on (there are more than one song in the list) -> unbind service. do not stop it.
         // 2. Music mode is off -> service doesn't exist. do nothing.
-        // 3. Music finished (free playback is finished) -> service is already unbound, and stopped. reciever is also unregister. so do nothing.
         super.onDestroy();
-        Log.d(getClass().getSimpleName(), "Service tracker : On Destroy");
-        if (isMusicModeOn && !isMusicFinished) {
+        if (isMusicModeOn) {
             if (musicBound) {
                 unbindService(musicConnection);
             }
@@ -821,6 +781,7 @@ public class HiitTimerActivity extends AppCompatActivity implements View.OnClick
         notifManager.cancel(notificationId);
         mSoundPoolHelper = null;
     }
+
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
@@ -835,12 +796,14 @@ public class HiitTimerActivity extends AppCompatActivity implements View.OnClick
         super.onSaveInstanceState(outState);
     }
 
+
     @Override
     public void onCompletion(MediaPlayer mp) {
         if (musicService != null) {
             musicService.pauseSong();
         }
     }
+
 
     private long readDuration(int resource) {
         Uri mediaPath = Uri.parse("android.resource://" + getPackageName() + "/" + resource);

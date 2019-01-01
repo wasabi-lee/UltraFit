@@ -1,6 +1,7 @@
 package com.inceptedapps.wasabi.ultimateworkouttimerforhiit.util;
 
 import com.inceptedapps.wasabi.ultimateworkouttimerforhiit.hiit.HiitTimerSet;
+import com.inceptedapps.wasabi.ultimateworkouttimerforhiit.hiit.TimerSession;
 
 public class RoundHelper {
 
@@ -119,6 +120,28 @@ public class RoundHelper {
         }
 
         return total + warmupTime + cooldownTime;
+    }
+
+
+    public static String[] getWorkoutNameArr(HiitTimerSet set) {
+        return set.getWorkoutNames().split("=");
+    }
+
+
+    public static int[] getTimeArr(HiitTimerSet set, TimerSession session) {
+        String[] temp;
+        if (session == TimerSession.WORK) {
+            temp = set.getWorkSeconds().split("=");
+        } else {
+            temp = set.getRestSeconds().split("=");
+        }
+
+        int[] result = new int[temp.length];
+        for (int i = 0; i < temp.length; i++) {
+            result[i] = Integer.parseInt(temp[i]);
+        }
+
+        return result;
     }
 
 }

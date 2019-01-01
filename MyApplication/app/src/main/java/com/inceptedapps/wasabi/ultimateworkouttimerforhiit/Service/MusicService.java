@@ -18,10 +18,8 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
 import com.inceptedapps.wasabi.ultimateworkouttimerforhiit.R;
-import com.inceptedapps.wasabi.ultimateworkouttimerforhiit.activities.MainActivity;
 import com.inceptedapps.wasabi.ultimateworkouttimerforhiit.music.Song;
 import com.inceptedapps.wasabi.ultimateworkouttimerforhiit.music.SongSingleton;
-import com.inceptedapps.wasabi.ultimateworkouttimerforhiit.custom.IsPremiumSingleton;
 
 import java.util.ArrayList;
 import java.util.Random;
@@ -33,7 +31,6 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
 
     public static final String FROM_MUSIC_SERVICE = "com.inceptedapps.wasabi.ultimateworkouttimerforhiit.Service.FROM_MUSIC_SERVICE";
     public static final String UI_CHANGE_MESSAGE = "com.inceptedapps.wasabi.ultimateworkouttimerforhiit.Service.UI_CHANGE_MESSAGE";
-    public static final String MUSIC_FINISHED_MESSAGE = "com.inceptedapps.wasabi.ultimateworkouttimerforhiit.Service.MUSIC_FINISHED_MESSAGE";
 
     private MediaPlayer player;
     private ArrayList<Song> songs;
@@ -43,7 +40,7 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
     private Random random = new Random();
     private CountDownTimer timer;
 
-    private boolean isShuffleOn = false, isPaused = false, isPremium = IsPremiumSingleton.getInstance().returnPremium();
+    private boolean isShuffleOn = false, isPaused = false;
 
     @Nullable
     @Override
@@ -73,7 +70,6 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
         broadcaster = LocalBroadcastManager.getInstance(this);
 
         initMusicPlayer();
-        initTimer(isPremium);
         super.onCreate();
     }
 
@@ -104,26 +100,6 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
         return isPaused;
     }
 
-    public void initTimer(boolean isPremium) {
-        if (!isPremium) {
-            timer = new CountDownTimer(1000 * 60 * 10 , 1000) {
-                @Override
-                public void onTick(long millisUntilFinished) {
-                    Log.d(getClass().getSimpleName(), "Until music finish: " + millisUntilFinished);
-                }
-
-                @Override
-                public void onFinish() {
-                    sendMusicFinishBroadcast();
-                    isPaused = true;
-                    player.reset();
-                    player.release();
-                    player = null;
-                    stopSelf();
-                }
-            };
-        }
-    }
 
 
     public void initMusicPlayer() {
@@ -148,12 +124,10 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
             if (player.isPlaying()) {
                 isPaused = true;
                 player.pause();
-                Log.d(getClass().getSimpleName(), "Paused the music");
                 return isPaused;
             } else {
                 isPaused = false;
                 player.start();
-                Log.d(getClass().getSimpleName(), "Resumed the music");
                 return isPaused;
             }
         }
@@ -262,6 +236,7 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
         sendResult(songPosition);
     }
 
+
     private void getNextRandomSongPosition() {
         songPosition = random.nextInt(songs.size());
         while (songPosition == previousSongPosition) {
@@ -269,11 +244,6 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
         }
     }
 
-    public void sendMusicFinishBroadcast(){
-        Intent intent = new Intent(FROM_MUSIC_SERVICE);
-        intent.putExtra(MUSIC_FINISHED_MESSAGE, true);
-        broadcaster.sendBroadcast(intent);
-    }
 
     public void sendResult(int songPosition) {
         Intent intent = new Intent(FROM_MUSIC_SERVICE);
